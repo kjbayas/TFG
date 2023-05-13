@@ -1,0 +1,33 @@
+<table>
+    <!-- Cabecera del calendario -->
+    <thead>
+      <tr>
+        {% for dia_semana in nombres_dias_semana %}
+        <th>{{ dia_semana }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Filas del calendario -->
+      {% for semana in calendario %}
+      <tr>
+        {% for dia in semana %}
+        <!-- Celda del calendario -->
+        <td>
+          <span class="dia">{{ dia }}</span>
+          <!-- Mostrar los eventos del día -->
+          {% for evento in eventos %}
+          {% if evento.dia == dia %}
+          <div class="evento">
+            <span>{{ evento.titulo }}</span>
+            <span>{{ evento.descripcion }}</span>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
