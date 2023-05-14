@@ -1,43 +1,6 @@
 {% include 'sitio/cabecera.html' %}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Nosotros</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css">
-    <style>
-        /* Estilos personalizados para el calendario */
-        #calendario {
-            float: right;  /* Coloca el calendario a la derecha */
-            width: 400px;  /* Ajusta el ancho del calendario */
-            height: 300px; /* Ajusta la altura del calendario */
-        }
-    </style>
-</head>
-<body>
-    <!-- Contenido de la página -->
-    <h1>Calendario</h1>
+<div id="calendario"></div>
 
-    <!-- Aquí puedes agregar el calendario -->
-    <div id="calendario"></div>
-
-    <!-- Incluye las bibliotecas de JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#calendario').fullCalendar({
-                // Configuración del calendario
-                // Aquí puedes personalizar el aspecto y el comportamiento del calendario
-                // Consulta la documentación de FullCalendar para obtener más detalles
-            });
-        });
-
-    </script>    
-    
-</body>
-</html>
 
 {% include 'sitio/pie.html' %}

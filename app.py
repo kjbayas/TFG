@@ -1,5 +1,5 @@
 import os # Nos permite enviar información
-from flask import Flask, render_template, request, redirect, session, url_for, send_from_directory
+from flask import Flask, render_template, request, redirect, session, url_for, send_from_directory, jsonify
 from flaskext.mysql import MySQL
 from datetime import datetime
 
@@ -98,6 +98,27 @@ def admin_login_post():
         return redirect('/admin')
     else:
         return render_template('admin/login.html', mensaje='Acceso Denegado' )
+
+@app.route('/admin/registro', methods=['GET', 'POST'])
+def admin_registro():
+    if request.method == 'POST':
+        # Lógica para manejar los datos del formulario de registro
+        username = request.form['txtUsuario']
+        password = request.form['txtPassword']
+        email = request.form['txtEmail']
+        tipo_usuario = request.form['txtTipoUsuario']
+
+        # Guardar los datos en la base de datos
+        conexion = mysql.connect()
+        cursor = conexion.cursor()
+        query = "INSERT INTO login (username, password, email, tipo_usuario) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query, (username, password, email, tipo_usuario))
+        conexion.commit()
+        conexion.close()
+
+        return redirect('/admin/login')  # Redirigir al inicio de sesión después del registro exitoso
+
+    return render_template('admin/registro.html')
 
 
 @app.route('/admin/libros/guardar', methods=['POST'])
