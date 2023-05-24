@@ -9,20 +9,40 @@
 
   <!-- Bootstrap CSS v5.2.1 -->
   <link href="/css/bootstrap.css" rel="stylesheet" crossorigin="anonymous" > 
-
+  <style>
+    /* Estilos para el logotipo */
+    .navbar-brand img {
+      width: 100px;
+    } 
+    body {
+        margin: 20px; /* Establece el margen deseado */
+    }
+  </style>
 </head>
 <body>
 
 <!--Menu y container-->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark " >
-    <div class="nav navbar-nav">
-        <a class="nav-item nav-link" href="/"> Home </a>
-        <a class="nav-item nav-link" href="/libros">Libros</a>
-        <a class="nav-item nav-link" href="/nosotros">URJC</a>
-        <a class="nav-item nav-link" href="/admin/login">Login</a>
-
+<nav class="navbar navbar-expand-xl navbar-light bg-light">
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link" href="/">Home</a>
+          <a class="nav-item nav-link" href="/libros">Libros</a>
+          <a class="nav-item nav-link" href="/nosotros">URJC</a>
+          <a class="nav-item nav-link" href="/admin/login">Login</a>
+        </div>
+        <a class="navbar-brand" href="#">
+            <img src="/img/logoURJC.png" alt="Logo">
+        </a>
+      </div>
     </div>
-</nav>
+  </nav>
 
-<div class="container">
+
     <br/>
+</body>
+</html>

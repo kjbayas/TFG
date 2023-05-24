@@ -1,14 +1,25 @@
 {% include 'admin/cabecera.html' %}
-
-<div class="p-5 bg-light">
-    <div class="container">
-        <h1 class="display-3"> Bienvenid@ <strong>{{session['username']}}</strong> ahora podras administrar todos tus documentos </h1>
-        <p class="lead"> Hay que seguir implementando cosas, como subir imagenes y poner estilos, esta es una pag de bienvenida   </p>
-        <hr class="my-2">
-        <p class="lead">
-            <a class="btn btn-primary btn-lg" href="/admin/libros" role="button"> Subir archivos </a>
+</br>
+<div class="row">
+    <div class="col-md-10">
+        <div class="p-5 mb-8 bg-light rounded-3">
+            <p class="lead"> Hay que seguir implementando cosas, como subir imagenes y poner estilos, esta es una pag de bienvenida   </p>
+            <hr class="my-2">
+            <p class="lead">
+            <a class="btn btn-outline-success " href="/admin/libros" role="button"> Subir archivos </a>
         </p>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="p-5 mb-4 bg-light rounded-3">
+            <p > Bienvenid@ <strong style="color: rgb(143, 12, 75);">{{session['username']}}</strong> 
+                ahora podrás administrar todos tus documentos
+            </p>
+          </div>
     </div>
 </div>
+
+  
+
 
 {% include 'admin/pie.html' %}

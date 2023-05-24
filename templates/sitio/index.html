@@ -1,15 +1,642 @@
 {% include 'sitio/cabecera.html' %}
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/json2/20160511/json2.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='estilos.css') }}">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.js"></script>
 
-  <div class="p-5 mb-4 bg-light rounded-3">
-    <div class="container-fluid py-5">
-      <h1 class="display-5 fw-bold">Bienvenidos a la Web</h1>
-      <p class="col-md-8 fs-4">Pagina web para el grado de Arquitectura de la URJC</p>
-      <hr class="my-2">
-      <p class="lead">
-        <a href="/libros" class="btn btn-danger btn-lg" role="button">Documentos</a>
-      </p>
+
+</head>
+<body>
+  <div class="row">
+    <div class="col-md-2">
+      <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5">
+          <h1>URJC </h1>
+          <p class="col-md-8 fs-4">Grado en Arquitectura</p>
+          <hr class="my-2">
+          <p class="lead">
+            <a href="/libros" class="btn btn-danger btn-lg" role="button">Documentos</a>
+          </p>
+        </div>
+      </div>
     </div>
+  
+    
+    <div class="col-md-10">
+      <div class="p-5 mb-8 bg-light rounded-3">
+        <h1>Información Básica</h1>
+        <div class="accordion" id="informacion-accordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="proyecto-heading">
+              <button class="accordion-button" type="button" data-toggle="collapse" data-target="#proyecto-collapse" aria-expanded="true" aria-controls="proyecto-collapse">
+                ¿Qué conocimientos voy a adquirir con este Grado?
+              </button>
+            </h2>
+            <div id="proyecto-collapse" class="accordion-collapse collapse" aria-labelledby="proyecto-heading" data-bs-parent="#informacion-accordion">
+              <div class="accordion-body">
+                <p style="color: darkblue;"><strong>Proyecto de edificación y dirección de obra:</strong></p>
+                <p>Conocimiento para la concepción, planeamiento y ejecución de edificios de nueva planta y de la intervención en edificios existentes teniendo en cuenta factores técnicos, artísticos, humanos y económicos. Conocimiento de la metodología de proyecto de edificación y de dirección y gestión de obras de edificación.</p>
+                <p style="color: darkblue;"><strong>Urbanismo, sociología y ciudad:</strong></p>
+                <p>Conocimiento de las distintas figuras de planeamiento urbanístico y sus formas de desarrollo técnico, artístico, social y de gestión. Diseño, planeamiento y ejecución de espacios urbanos, jardines, polígonos y, en general, ordenamiento del territorio en diferentes escalas teniendo en cuenta factores técnicos, humanos, artísticos y económicos.</p>
+                <p style="color: darkblue;"><strong>Arquitectura, empresa y gestión:</strong></p>
+                <p>Conocimiento tanto de las normas que se aplican al ejercicio de la profesión de Arquitecto como de la organización y gestión de la actividad profesional. Conocimiento de los sistemas de gestión, tasación y valoración inmobiliaria. Conocimientos sobre economía y gestión empresarial necesarios para el desarrollo de su actividad profesional y emprendedora. Nociones de las capacidades del Arquitecto para ampliar su abanico de posibilidades laborales. Conocimiento de la legislación vigente y del funcionamiento de los Colegios Profesionales.</p>
+                <p style="color: darkblue;"><strong>Construcción, cálculo de estructuras y materiales:</strong></p>
+                <p>Conocimiento de los condicionantes que afectan a la edificación, al urbanismo y, en general, al planeamiento y ejecución de espacios y sus soluciones técnicas. Conocimientos sobre materiales, geotecnia, concepción, diseño y cálculo de estructuras, concepción, diseño y cálculo de instalaciones, patología en la edificación y rehabilitación y gestión del patrimonio.</p>
+                <p style="color: darkblue;"><strong>Diseño, arte y espacio:</strong></p>
+                <p>Conocimiento de la historia del arte y de la arquitectura. Conocimiento de las técnicas y recursos gráficos para la concepción y representación espacial, real y virtual: desde el dibujo analítico y conceptual –de idea– hasta la representación final técnica –para ejecución– o comunicativa –para concurso o presentación a cliente–. Conocimiento del diseño en general y del diseño gráfico en particular y su aplicación a la arquitectura. Concepción de espacios expositivos, escenografía y arquitectura efímera.</p>
+              </div>
+            </div>
+          </div>
+          <!-- Areas Temáticas -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="temas-heading">
+              <button class="accordion-button" type="button" data-toggle="collapse" data-target="#temas-collapse" aria-expanded="true" aria-controls="temas-collapse">
+                ¿Qué áreas temáticas voy a abordar en este grado?
+              </button>
+            </h2>
+            <div id="temas-collapse" class="accordion-collapse collapse" aria-labelledby="temas-heading" data-bs-parent="#informacion-accordion">
+              <div class="accordion-body">
+                <p>La Arquitectura reúne conocimientos de las Artes, la ciencia y la tecnología y las ciencias sociales. Las áreas temáticas que aborda este Grado son:</p>
+                <ul>
+                  <li>Proyecto de edificación y dirección de obra.</li>
+                  <li>Urbanismo, sociología y ciudad.</li>
+                  <li>Arquitectura, empresa y gestión.</li>
+                  <li>Construcción, cálculo de estructuras y materiales.</li>
+                  <li>Diseño, arte y espacio.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="otro-heading">
+              <button class="accordion-button" type="button" data-toggle="collapse" data-target="#otro-collapse-1" aria-expanded="true" aria-controls="otro-collapse">
+                Requisitos minimos de permanencia
+              </button>
+            </h2>
+            <div id="otro-collapse-1" class="accordion-collapse collapse" aria-labelledby="otro-heading" data-bs-parent="#informacion-accordion">
+              <div class="accordion-body">
+                <ul style="list-style-type: square;">
+                  <li>La permanencia de los alumnos en los estudios de Grado será de un máximo de ocho años para estudiantes a tiempo completo. Los alumnos a tiempo parcial podrán solicitar al Rector una prórroga de hasta dos años más.</li>
+                  <li>En los Grados de duración superior a 240 créditos (4 años), el máximo del apartado anterior se incrementará en un año más por cada 60 créditos ECTS que se adicionen a los 240 ECTS.</li>
+                  <li>Los estudiantes habrán de superar en el primer curso un mínimo de dos asignaturas. Los estudiantes que cursen estudios a tiempo parcial, deberán superar al menos una asignatura en su primer año académico.</li>
+                  <li>Los estudiantes que estén cursando cualquier titulación oficial de Grado de la Universidad Rey Juan Carlos podrán realizar un máximo de cuatro matrículas para la superación de cada una de las asignaturas del plan de estudios, sin contar anulaciones anteriores de las mismas.</li>
+                </ul>
+                <p>Para ampliar esta información ver:
+                  <a href="https://www.urjc.es/images/Universidad/Presentacion/normativa/Normativa%20Permanencia%20y%20Matricula.pdf?ml=1&iframe=1" style="color:red">Normativa de permanencia</a></p>
+              </div>
+            </div>
+          </div>
+          <!--  -->
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="otro-heading">
+              <button class="accordion-button" type="button" data-toggle="collapse" data-target="#otro-collapse-2" aria-expanded="true" aria-controls="otro-collapse">
+                Competencias
+              </button>
+            </h2>
+            <div id="otro-collapse-2" class="accordion-collapse collapse " aria-labelledby="otro-heading" data-bs-parent="#informacion-accordion">
+              <div class="accordion-body">
+                <p>COMPETENCIAS GENERALES</p>
+                <ul>
+                  <li>CG1&nbsp; Que los estudiantes hayan demostrado poseer y comprender conocimientos en un área de estudio que parte de la base de la educación secundaria general, y se suele encontrar a un nivel que, si bien se apoya en libros de texto avanzados, incluye también algunos aspectos que implican conocimientos procedentes de la vanguardia de su campo de estudio</li>
+                  <li>CG2&nbsp; Que los estudiantes sepan aplicar sus conocimientos a su trabajo o vocación de una forma profesional y posean las competencias que suelen demostrarse por medio de la elaboración y defensa de argumentos y la resolución de problemas dentro de su área de estudio</li>
+                  <li>CG3&nbsp; Que los estudiantes tengan la capacidad de reunir e interpretar datos relevantes (normalmente dentro de su área de estudio) para emitir juicios que incluyan una reflexión sobre temas relevantes de índole social, científica o ética</li>
+                  <li>CG4&nbsp; Que los estudiantes puedan transmitir información, ideas, problemas y soluciones a un público tanto especializado como no especializado</li>
+                  <li>CG5&nbsp; Que los estudiantes hayan desarrollado aquellas habilidades de aprendizaje necesarias para emprender estudios posteriores con un alto grado de autonomía</li>
+                  <li>CG6&nbsp; Conocer la historia y las teorías de la arquitectura, así como las artes, tecnologías y ciencias humanas relacionadas con esta.</li>
+                  <li>CG7&nbsp; Conocer el papel de las bellas artes como factor que puede influir en la calidad de la concepción arquitectónica.</li>
+                  <li>CG8&nbsp; Conocer el urbanismo y las técnicas aplicadas en el proceso de planificación.</li>
+                  <li>CG9&nbsp; Comprender los problemas de la concepción estructural, de construcción y de ingeniería vinculados con los proyectos de edificios así como las técnicas de resolución de estos.</li>
+                  <li>CG10&nbsp; Conocer los problemas físicos, las distintas tecnologías y la función de los edificios de forma que se dote a éstos de condiciones internas de comodidad y protección de los factores climáticos.</li>
+                  <li>CG11 Conocer las industrias, organizaciones, normativas y procedimientos para plasmar los proyectos en edificios y para integrar los planos en la planificación.</li>
+                  <li>CG12&nbsp; Comprender las relaciones entre las personas y los edificios y entre éstos y su entorno, así como la necesidad de relacionar los edificios y los espacios situados entre ellos en función de las necesidades y de la escala humana.</li>
+                </ul>
+                <p>COMPETENCIAS ESPECÍFICAS</p>
+                <ul>
+                  <li>CE1&nbsp; Aptitud para aplicar los procedimientos gráficos a la representación de espacios y objetos (TALLER)</li>
+                  <li>CE2&nbsp; Aptitud para concebir y representar los atributos visuales de los objetos y dominar la proporción y las técnicas del dibujo, incluidas las informáticas (TALLER)</li>
+                  <li>CE3&nbsp; Conocimiento adecuado y aplicado a la arquitectura y al urbanismo de: Los sistemas de representación espacial</li>
+                  <li>CE4&nbsp; Conocimiento adecuado y aplicado a la arquitectura y al urbanismo de: El análisis y teoría de la forma y las leyes de la percepción visual</li>
+                  <li>CE5&nbsp; Conocimiento adecuado y aplicado a la arquitectura y al urbanismo de: La geometría métrica y proyectiva</li>
+                  <li>CE6&nbsp; Conocimiento adecuado y aplicado a la arquitectura y al urbanismo de: Las técnicas de levantamiento gráfico en todas sus fases, desde el dibujo de apuntes a la restitución científica</li>
+                  <li>CE7&nbsp; Conocimiento adecuado y aplicado a la arquitectura y al urbanismo de: Los principios de la mecánica general, la estática, la geometría de masas y los campos vectoriales y tensoriales</li>
+                  <li>CE8&nbsp; Conocimiento adecuado y aplicado a la arquitectura y al urbanismo de: Los principios de termodinámica, acústica y óptica</li>
+                  <li>CE9&nbsp; Conocimiento adecuado y aplicado a la arquitectura y al urbanismo de: Los principios de mecánica de fluidos, hidráulica, electricidad y electromagnetismo</li>
+                  <li>CE10&nbsp; Conocimiento adecuado y aplicado a la arquitectura y al urbanismo de: Las bases de topografía, hipsometría y cartografía y las técnicas de modificación del terreno</li>
+                  <li>CE11&nbsp; Conocimiento adecuado y aplicado a la arquitectura y al urbanismo de: El cálculo numérico, la geometría analítica y diferencial y los métodos algebraicos</li>
+                  <li>CE12&nbsp; Aptitud para concebir, calcular, diseñar, integrar en edificios y conjuntos urbanos y ejecutar: Soluciones de cimentación (TALLER)</li>
+                  <li>CE13&nbsp; Aptitud para: Aplicar las normas técnicas y constructivas</li>
+                  <li>CE14&nbsp; Aptitud para: Conservar las estructuras de edificación, la cimentación y obra civil</li>
+                  <li>CE15&nbsp; Aptitud para: Conservar la obra acabada</li>
+                  <li>CE16&nbsp; Aptitud para: Valorar las obras</li>
+                  <li>CE17&nbsp; Capacidad para concebir, calcular, diseñar, integrar en edificios y conjuntos urbanos y ejecutar: Estructuras de edificación (TALLER)</li>
+                  <li>CE18&nbsp; Capacidad para concebir, calcular, diseñar, integrar en edificios y conjuntos urbanos y ejecutar: Sistemas de división interior, carpintería, escaleras y demás obra acabada (TALLER)</li>
+                  <li>CE19&nbsp; Capacidad para concebir, calcular, diseñar, integrar en edificios y conjuntos urbanos y ejecutar: Sistemas de cerramiento, cubierta y demás obra gruesa (TALLER)</li>
+                  <li>CE20&nbsp; Capacidad para concebir, calcular, diseñar, integrar en edificios y conjuntos urbanos y ejecutar: Instalaciones de suministro, tratamiento y evacuación de aguas, de calefacción y de climatización</li>
+                  <li>CE21&nbsp; Capacidad para: Conservar la obra gruesa</li>
+                  <li>CE22&nbsp; Capacidad para: Proyectar instalaciones edificatorias y urbanas de transformación y suministro eléctricos, de comunicación audiovisual, de acondicionamiento acústico y de iluminación artificial</li>
+                  <li>CE23&nbsp; Capacidad para: Conservar instalaciones</li>
+                  <li>CE24&nbsp; Conocimiento adecuado de: La mecánica de sólidos, de medios continuos y del suelo, así como de las cualidades plásticas, elásticas y de resistencia de los materiales de obra pesada</li>
+                  <li>CE25&nbsp; Conocimiento adecuado de: Los sistemas constructivos convencionales y su patología</li>
+                  <li>CE26&nbsp; Conocimiento adecuado de: Las características físicas y químicas, los procedimientos de producción, la patología y el uso de los materiales de construcción</li>
+                  <li>CE27&nbsp; Conocimiento adecuado de: Los sistemas constructivos industrializados</li>
+                  <li>CE28&nbsp; Conocimiento de: La deontología, la organización colegial, la estructura profesional y la responsabilidad civil</li>
+                  <li>CE29&nbsp; Conocimiento de: Los procedimientos administrativos y de gestión y tramitación profesional</li>
+                  <li>CE30&nbsp; Conocimiento de: La organización de oficinas profesionales</li>
+                  <li>CE31&nbsp; Conocimiento de: Los métodos de medición, valoración y peritaje</li>
+                  <li>CE32&nbsp; Conocimiento de: El proyecto de seguridad e higiene en obra</li>
+                  <li>CE33&nbsp; Conocimiento de: La dirección y gestión inmobiliarias</li>
+                  <li>CE34&nbsp; Aptitud para: Suprimir barreras arquitectónicas (TALLER)</li>
+                  <li>CE35&nbsp; Aptitud para: Resolver el acondicionamiento ambiental pasivo, incluyendo el aislamiento térmico y acústico, el control climático, el rendimiento energético y la iluminación natural (TALLER)</li>
+                  <li>CE36&nbsp; Aptitud para: Catalogar el patrimonio edificado y urbano y planificar su protección (TALLER)</li>
+                  <li>CE37&nbsp; Capacidad para la concepción, la práctica y desarrollo de: Proyectos básicos y de ejecución, croquis y anteproyectos (TALLER)</li>
+                  <li>CE38&nbsp; Capacidad para la concepción, la práctica y desarrollo de: Proyectos urbanos (TALLER)</li>
+                  <li>CE39&nbsp; Capacidad para la concepción, la práctica y desarrollo de: Dirección de obras (TALLER)</li>
+                  <li>CE40&nbsp; Capacidad para: Elaborar programas funcionales de edificios y espacios urbanos (TALLER)</li>
+                  <li>CE41&nbsp; Capacidad para: Intervenir en y conservar, restaurar y rehabilitar el patrimonio construido (TALLER)</li>
+                  <li>CE42&nbsp; Capacidad para: Ejercer la crítica arquitectónica</li>
+                  <li>CE43&nbsp; Capacidad para: Realizar proyectos de seguridad, evacuación y protección en inmuebles (TALLER)</li>
+                  <li>CE44&nbsp; Capacidad para: Redactar proyectos de obra civil (TALLER)</li>
+                  <li>CE45&nbsp; Capacidad para: Diseñar y ejecutar trazados urbanos y proyectos de urbanización, jardinería y paisaje (TALLER)</li>
+                  <li>CE46&nbsp; Capacidad para: Aplicar normas y ordenanzas urbanísticas (TALLER)</li>
+                  <li>CE47&nbsp; Capacidad para: Elaborar estudios medioambientales, paisajísticos y de corrección de impactos ambientales(TALLER)</li>
+                  <li>CE48&nbsp; Conocimiento adecuado de: Las teorías generales de la forma, la composición y los tipos arquitectónicos</li>
+                  <li>CE49&nbsp; Conocimiento adecuado de: La historia general de la arquitectura</li>
+                  <li>CE50&nbsp; Conocimiento adecuado de: Los métodos de estudio de los procesos de simbolización, las funciones prácticas y la ergonomía</li>
+                  <li>CE51&nbsp; Conocimiento adecuado de: Los métodos de estudio de las necesidades sociales, la calidad de vida, la habitabilidad y los programas básicos de vivienda</li>
+                  <li>CE52&nbsp; Conocimiento adecuado de: La ecología, la sostenibilidad y los principios de conservación de recursos energéticos y medioambientales</li>
+                  <li>CE53&nbsp; Conocimiento adecuado de: Las tradiciones arquitectónicas, urbanísticas y paisajísticas de la cultura occidental, así como de sus fundamentos técnicos, climáticos, económicos, sociales e ideológicos</li>
+                  <li>CE54&nbsp; Conocimiento adecuado de: La estética y la teoría e historia de las bellas artes y las artes aplicadas</li>
+                  <li>CE55&nbsp; Conocimiento adecuado de: La relación entre los patrones culturales y las responsabilidades sociales del arquitecto</li>
+                  <li>CE56&nbsp; Conocimiento adecuado de: Las bases de la arquitectura vernácula</li>
+                  <li>CE57&nbsp; Conocimiento adecuado de: La sociología, teoría, economía e historia urbanas</li>
+                  <li>CE58&nbsp; Conocimiento adecuado de: Los fundamentos metodológicos del planeamiento urbano y la ordenación territorial y metropolitana</li>
+                  <li>CE59&nbsp; Conocimiento de: La reglamentación civil, administrativa, urbanística, de la edificación y de la industria relativa al desempeño profesional</li>
+                  <li>CE60&nbsp; Conocimiento de: El análisis de viabilidad y la supervisión y coordinación de proyectos integrados</li>
+                  <li>CE61&nbsp; Conocimiento de: La tasación de bienes inmuebles</li>
+                  <li>CE62&nbsp; Conocimiento de: Los mecanismos de redacción y gestión de los planes urbanísticos a cualquier escala</li>
+                  <li>CE63&nbsp; Elaboración, presentación y defensa ante un Tribunal Universitario de un trabajo académico original realizado individualmente relacionado con cualquiera de las disciplinas cursadas.</li>
+                  </ul>
+              </div>
+            </div>
+          </div>
+          <!-- -->
+        </br>
+        <h1> Itinerario Formativo </h1>
+        <div class="accordion" id="informacion-accordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="proyecto-heading">
+              <button class="accordion-button" type="button" data-toggle="collapse" data-target="#proyecto-collapse-3" aria-expanded="true" aria-controls="proyecto-collapse">
+                  CURSO 1º
+              </button>
+            </h2>
+            <div id="proyecto-collapse-3" class="accordion-collapse collapse" aria-labelledby="proyecto-heading" data-bs-parent="#informacion-accordion">
+              <div class="accordion-body">
+                <table summary="curso 1" role="navigation" align="center" class="table table-bordered">
+                  <tbody>
+                    <tr aria-hidden="true" style="color: rgb(47, 69, 235);">
+                      <td align="center" ><strong>Semestre</strong></td>
+                      <td align="center"><strong>Asignatura</strong></td>
+                      <td align="center"><strong>Carácter</strong></td>
+                      <td align="center"><strong>Créditos ECTS</strong></td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">Anual</td>
+                      <td align="center">Representación arquitectónica</td>
+                      <td align="center">FBR</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">Anual</td>
+                      <td align="center">Dibujo del natural</td>
+                      <td align="center">OB</td>
+                      <td align="center">9</td>
+                    </tr>
+                    <tr role="row" aria-labelledby="i4t-id-21" >
+                      <td align="center">Anual</td>
+                      <td align="center">Comunicación gráfica</td>
+                      <td align="center">OB</td>
+                      <td align="center">9</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Historia del arte y de la arquitectura I</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Matemáticas I</td>
+                      <td align="center">FBR</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Sistemas informáticos aplicados a la arquitectura</td>
+                      <td align="center">FBC</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">2</td>
+                      <td align="center">Tipologías arquitectónicas</td>
+                      <td align="center">OB</td>
+                      <td align="center">3</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">2</td>
+                      <td align="center">Historia del arte y de la arquitectura II</td>
+                      <td align="center">OB</td>
+                      <td align="center">3</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">2</td>
+                      <td align="center">Matemáticas II</td>
+                      <td align="center">FBR</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">2</td>
+                      <td align="center">Materiales de construcción</td>
+                      <td align="center">FBR</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr aria-hidden="true">
+                      <td colspan="4" align="center" style="color: rgb(47, 69, 235);"><strong>Total de créditos a cursar: 60</strong></td>
+                    </tr>
+                  </tbody>
+                </table> 
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="proyecto-heading">
+              <button class="accordion-button" type="button" data-toggle="collapse" data-target="#proyecto-collapse-4" aria-expanded="true" aria-controls="proyecto-collapse">
+                  CURSO 2º
+              </button>
+            </h2>
+            <div id="proyecto-collapse-4" class="accordion-collapse collapse" aria-labelledby="proyecto-heading" data-bs-parent="#informacion-accordion">
+              <div class="accordion-body">
+                <table summary="curso 2" role="navigation" align="center" class="table table-bordered">
+                  <tbody>
+                    <tr aria-hidden="true" style="color: rgb(47, 69, 235);">
+                      <td align="center"><strong>Semestre</strong></td>
+                      <td align="center"><strong>Asignatura</strong></td>
+                      <td align="center"><strong>Carácter</strong></td>
+                      <td align="center"><strong>Créditos ECTS</strong></td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">Anual</td>
+                      <td align="center">Introducción a proyectos</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">Anual</td>
+                      <td align="center">Comunicación y representación de proyectos arquitectónicos</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">Anual</td>
+                      <td align="center">Idioma moderno</td>
+                      <td align="center">FBC</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">1</td>
+                      <td align="center">Física aplicada a estructuras e instalaciones</td>
+                      <td align="center">FBR</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Deontología</td>
+                      <td align="center">FBC</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Historia social y urbana</td>
+                      <td align="center">FBC</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Vanguardias y arquitectura</td>
+                      <td align="center">OB</td>
+                      <td align="center">3</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">2</td>
+                      <td align="center">Organización y gestión de la actividad del arquitecto</td>
+                      <td align="center">FBR</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">2</td>
+                      <td align="center">Física básica</td>
+                      <td align="center">FBR</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">2</td>
+                      <td align="center">Introducción al urbanismo</td>
+                      <td align="center">OB</td>
+                      <td align="center">3</td>
+                    </tr>
+                      <tr role="row">
+                      <td align="center">2</td>
+                      <td align="center">Sistemas constructivos I</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr aria-hidden="true">
+                      <td colspan="4" align="center" style="color: rgb(47, 69, 235);"><strong>Total de créditos a cursar: 60</strong></td>
+                    </tr>
+                  </tbody>
+                </table> 
+              </div>
+            </div>
+          </div>
+
+
+
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="proyecto-heading">
+              <button class="accordion-button" type="button" data-toggle="collapse" data-target="#proyecto-collapse-5" aria-expanded="true" aria-controls="proyecto-collapse">
+                  CURSO 3º
+              </button>
+            </h2>
+            <div id="proyecto-collapse-5" class="accordion-collapse collapse" aria-labelledby="proyecto-heading" data-bs-parent="#informacion-accordion">
+              <div class="accordion-body">
+                <table summary="curso 3" role="navigation" align="center" class="table table-bordered">
+                  <tbody>
+                    <tr aria-hidden="true" style="color: rgb(47, 69, 235);">
+                      <td align="center"><strong>Semestre</strong></td>
+                      <td align="center"><strong>Asignatura</strong></td>
+                      <td align="center"><strong>Carácter</strong></td>
+                      <td align="center"><strong>Créditos ECTS</strong></td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">Anual</td>
+                      <td align="center">Proyectos I</td>
+                      <td align="center">OB</td>
+                      <td align="center">12</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Introducción al diseño de estructuras</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Sistemas constructivos II</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">1</td>
+                      <td align="center">Diseño de instalaciones I: Electricidad e iluminación</td>
+                      <td align="center">OB</td>
+                      <td align="center">3</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Diseño de instalaciones II: Sistemas de comunicación y domótica</td>
+                      <td align="center">OB</td>
+                      <td align="center">3</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Normativa urbanística</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">2</td>
+                      <td align="center">Geotecnia</td>
+                      <td align="center">OB</td>
+                      <td align="center">3</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">2</td>
+                      <td align="center">Dimensionamiento de estructuras</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">2</td>
+                      <td align="center">Planeamiento y diseño urbanístico</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">2</td>
+                      <td align="center">I Diseño de instalaciones III: Fontanería, saneamiento, gas y climatización</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                      <tr role="row">
+                      <td align="center">2</td>
+                      <td align="center">Gestión inmobiliaria</td>
+                      <td align="center">OB</td>
+                      <td align="center">3</td>
+                    </tr>
+                    <tr aria-hidden="true">
+                      <td colspan="4" align="center" style="color: rgb(47, 69, 235);"><strong>Total de créditos a cursar: 60</strong></td>
+                    </tr>
+                  </tbody>
+                </table> 
+              </div>
+            </div>
+          </div>
+
+
+
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="proyecto-heading">
+              <button class="accordion-button" type="button" data-toggle="collapse" data-target="#proyecto-collapse-6" aria-expanded="true" aria-controls="proyecto-collapse">
+                  CURSO 4º
+              </button>
+            </h2>
+            <div id="proyecto-collapse-6" class="accordion-collapse collapse" aria-labelledby="proyecto-heading" data-bs-parent="#informacion-accordion">
+              <div class="accordion-body">
+                <table summary="curso 4" role="navigation" align="center" class="table table-bordered">
+                  <tbody>
+                    <tr aria-hidden="true" style="color: rgb(47, 69, 235);">
+                      <td align="center"><strong>Semestre</strong></td>
+                      <td align="center"><strong>Asignatura</strong></td>
+                      <td align="center"><strong>Carácter</strong></td>
+                      <td align="center"><strong>Créditos ECTS</strong></td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">Anual</td>
+                      <td align="center">Proyectos II</td>
+                      <td align="center">OB</td>
+                      <td align="center">12</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">Anual</td>
+                      <td align="center">Cálculo avanzado de estructuras</td>
+                      <td align="center">OB</td>
+                      <td align="center">9</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">Anual</td>
+                      <td align="center">Proyecto de urbanismo</td>
+                      <td align="center">OB</td>
+                      <td align="center">9</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">1</td>
+                      <td align="center">Patología, edificación e intervención</td>
+                      <td align="center">OB</td>
+                      <td align="center">3</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Instalaciones urbanas</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Tasaciones y valoraciones</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">2</td>
+                      <td align="center">Dirección de obra</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">2</td>
+                      <td align="center">Dimensionamiento de estructuras</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">2</td>
+                      <td align="center">Teoría y crítica arquitectónica</td>
+                      <td align="center">OB</td>
+                      <td align="center">4.5</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">2</td>
+                      <td align="center">Entorno social y urbano</td>
+                      <td align="center">OB</td>
+                      <td align="center">4.5</td>
+                    </tr>
+                    <tr aria-hidden="true">
+                      <td colspan="4" align="center" style="color: rgb(47, 69, 235);"><strong>Total de créditos a cursar: 60</strong></td>
+                    </tr>
+                  </tbody>
+                </table> 
+              </div>
+            </div>
+          </div>
+        
+
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="proyecto-heading">
+              <button class="accordion-button" type="button" data-toggle="collapse" data-target="#proyecto-collapse-7" aria-expanded="true" aria-controls="proyecto-collapse">
+                  CURSO 5º
+              </button>
+            </h2>
+            <div id="proyecto-collapse-7" class="accordion-collapse collapse" aria-labelledby="proyecto-heading" data-bs-parent="#informacion-accordion">
+              <div class="accordion-body">
+                <table summary="curso 5" role="navigation" align="center" class="table table-bordered">
+                  <tbody>
+                    <tr aria-hidden="true" style="color: rgb(47, 69, 235);">
+                      <td align="center"><strong>Semestre</strong></td>
+                      <td align="center"><strong>Asignatura</strong></td>
+                      <td align="center"><strong>Carácter</strong></td>
+                      <td align="center"><strong>Créditos ECTS</strong></td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Rehabilitación, patología y gestión del patrimonio histórico</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Project Management (Gestión de proyectos)</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Diseño y Viabilidad de Proyectos</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">1</td>
+                      <td align="center">Análisis del Entorno Urbano: Ciudad, redes, vehículo y peatón</td>
+                      <td align="center">OB</td>
+                      <td align="center">3</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Arquitectura Efímera: Escenografía y Espacios Expositivos</td>
+                      <td align="center">OB</td>
+                      <td align="center">3</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">1</td>
+                      <td align="center">Reconocimiento académico de créditos</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row" >
+                      <td align="center">Anual</td>
+                      <td align="center">Trabajo Fin de Grado</td>
+                      <td align="center">OB</td>
+                      <td align="center">6</td>
+                    </tr>
+                    <tr role="row">
+                      <td align="center">Anual</td>
+                      <td align="center">Prácticas externas</td>
+                      <td align="center">OB</td>
+                      <td align="center">24</td>
+                    </tr>
+                    <tr aria-hidden="true">
+                      <td colspan="4" align="center" style="color: rgb(47, 69, 235);"><strong>Total de créditos a cursar: 60</strong></td>
+                    </tr>
+                  </tbody>
+                </table> 
+              </div>
+            </div>
+          </div>
+
+
+
+
+
+        </div>
+        </div>
+      </div>
     </div>
+    
+    
+    
+  </div>
+  
+  <!-- <div id="grafico">
+    <h1>Temas relacionados</h1>
+  <script src="{{ url_for('static', filename='conectores.js') }}"></script>
+  </div> -->
 
-  {% include 'sitio/pie.html' %}
-
+  
+</body>
+</html>

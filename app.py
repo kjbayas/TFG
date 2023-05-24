@@ -1,12 +1,15 @@
 import os # Nos permite enviar información
 from flask import Flask, render_template, request, redirect, session, url_for, send_from_directory, jsonify
 from flaskext.mysql import MySQL
-from datetime import datetime
+from datetime import datetime, timedelta
+import json
 
 
 app=Flask(__name__)
 app.secret_key= os.urandom(24)
 mysql=MySQL()
+app.static_folder = 'static'
+
 
 app.config['MYSQL_DATABASE_HOST']='localhost'
 app.config['MYSQL_DATABASE_USER']='root'
@@ -17,8 +20,26 @@ mysql.init_app(app)
 
 @app.route('/')
 def inicio():
-    return render_template('sitio/index.html')
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
 
+    cursor.execute("SELECT * FROM nodos")
+    nodos = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM enlaces")
+    enlaces = cursor.fetchall()
+    nodos_json = json.dumps(nodos)
+    enlaces_json = json.dumps(enlaces)
+    # Imprime los valores de nodos y enlaces en la consola del servidor Flask
+    print(nodos_json)
+    print(enlaces_json)
+
+    conexion.close()
+
+    return render_template('sitio/index.html', nodos=nodos_json, enlaces=enlaces_json)
+
+
+    
 # Añadimos estilos 
 @app.route('/css/<archivocss>') 
 def css_link(archivocss):
@@ -43,7 +64,73 @@ def libros():
 
 @app.route('/nosotros')
 def nosotros():
-    return render_template('sitio/nosotros.html')
+    conexion=mysql.connect() #conectadonos con la base de datos 
+    cursor= conexion.cursor()
+    cursor.execute("SELECT id, title, str_to_date(start_event, '%Y-%m-%d %H:%i:%s'), str_to_date(end_event, '%Y-%m-%d %H:%i:%s') FROM events")
+    calendar=cursor.fetchall()
+    print(calendar)
+    conexion.close()
+
+    return render_template('sitio/nosotros.html', calendar=calendar)
+
+@app.route("/insert", methods=["POST", "GET"])
+def insert():
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
+    msg = ''
+    
+    if request.method == 'POST':
+        title = request.form['title']
+        start = request.form['start']
+        end = request.form['end']
+        print(title)
+        print(start)
+        print(end)
+        cursor.execute("INSERT INTO events (title, start_event, end_event) VALUES (%s, %s, %s)", [title, start, end])
+        conexion.commit()
+        conexion.close()
+        msg = 'success'
+    
+    return jsonify(msg)
+
+@app.route("/update", methods=["POST", "GET"])
+def update():
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
+    msg = ''
+    
+    if request.method == 'POST':
+        title = request.form['title']
+        start = request.form['start']
+        end = request.form['end']
+        id = request.form['id']
+        print(title)
+        print(start)
+        print(end)
+        print(id)
+        cursor.execute("UPDATE events SET title=%s, start_event=%s, end_event=%s WHERE id=%s", [title, start, end, id])
+        conexion.commit()
+        conexion.close()
+        msg = 'success'
+    
+    return jsonify(msg)
+
+
+@app.route("/ajax_delete", methods=["POST", "GET"])
+def ajax_delete():
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
+    msg = ''
+    
+    if request.method == 'POST':
+        getid = request.form['id']
+        print(getid)
+        cursor.execute("DELETE FROM events WHERE id={0}".format(getid))
+        conexion.commit()
+        conexion.close()
+        msg = 'success'
+    
+    return jsonify(msg)
 
 
 @app.route('/admin/')
@@ -94,7 +181,7 @@ def admin_login_post():
 
     if login is not None :
         session['login']=True
-        session['username']=login[3]
+        session['username']=login[1]
         return redirect('/admin')
     else:
         return render_template('admin/login.html', mensaje='Acceso Denegado' )
@@ -177,6 +264,10 @@ def admin_libros_borrar():
     conexion.commit()
     
     return redirect('/admin/libros')
+
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
 
 
 if __name__ == '__main__':

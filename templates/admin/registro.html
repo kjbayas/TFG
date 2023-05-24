@@ -1,3 +1,4 @@
+{% include 'sitio/cabecera.html' %}
 <!doctype html>
 <html lang="en">
 
@@ -8,8 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS v5.2.1 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+  
 
 </head>
 
@@ -30,8 +30,7 @@
         {% endif %}
 
         <div class="card">
-          <div class="card-header">
-          </div>
+
           <div class="card-body">
             <form action="/admin/registro" method="post">
               <h3 class="text-center">Registro de usuario</h3>
@@ -61,8 +60,10 @@
                   <option value="usuario">Usuario</option>
                 </select>
               </div>
+              <div style="display: flex; justify-content: center; ">
+                <button type="submit" class="btn btn-dark">REGISTRARSE</button>
 
-              <button type="submit" class="btn btn-dark">REGISTRARSE</button>
+              </div>
             </form>
 
           </div>
