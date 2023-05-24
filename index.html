@@ -1,11 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ejecutar app.py con PyScript</title>
+  <link rel="stylesheet" href="assets/css/pyscript.css" />
+  <script defer src="assets/js/pyscript.js"></script>
+</head>
+<body>
+  <h1>Ejecutar app.py con PyScript</h1>
+  <form action="run_app.py" method="POST">
+    <input type="submit" value="Ejecutar Python">
+  </form>
+  
+  <script>
+    function abrirAplicacion() {
+      window.open("app.html", "_blank");
+    }
+  </script>
+  
+  <button onclick="abrirAplicacion()">Abrir Aplicación</button>
+</body>
+</html>
 
-<!-- Podemos instanciar los archivos de PyScript desde nuestro propio Servidor (Previamente descargados) -->
-<link rel="stylesheet" href="assets/css/pyscript.css" />
-<script defer src="assets/js/pyscript.js"></script>
-
-<! --debes de ingresar la opcion que quieres en numero>
-<form action="app.py">
-<input type=text name="opcion"><br>
-<input type=submit value="el disparador para esto">
-</form> 
-<p> TFG Karol actualizado</p>
