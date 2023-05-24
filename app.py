@@ -150,8 +150,8 @@ def admin_libros():
 
     if not 'login' in session:
         return redirect('/admin/login')
-
-    conexion=mysql.connect() #estamos conectadonos con la base de datos 
+    # Estamos conectadonos con la base de datos
+    conexion=mysql.connect()  
     cursor= conexion.cursor()
     cursor.execute("SELECT * FROM `libros`")
     libros=cursor.fetchall()
@@ -189,7 +189,7 @@ def admin_login_post():
 @app.route('/admin/registro', methods=['GET', 'POST'])
 def admin_registro():
     if request.method == 'POST':
-        # Lógica para manejar los datos del formulario de registro
+        # formulario de registro
         username = request.form['txtUsuario']
         password = request.form['txtPassword']
         email = request.form['txtEmail']
