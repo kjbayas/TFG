@@ -11,7 +11,11 @@ mysql=MySQL()
 app.static_folder = 'static'
 
 
+<<<<<<< HEAD
 app.config['MYSQL_DATABASE_HOST']='192.168.18'
+=======
+app.config['MYSQL_DATABASE_HOST']='192.168.1.18'
+>>>>>>> 028cfd29368b5397e8156054ea31ad61df3fe1ca
 app.config['MYSQL_DATABASE_USER']='karolbayas'
 app.config['MYSQL_DATABASE_PASSWORD']='urjc2023'
 app.config['MYSQL_DATABASE_DB']='sitio'
