@@ -1,24 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ejecutar app.py con PyScript</title>
-  <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
-  <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <title>Prueba de conexión</title>
 </head>
 <body>
-  <h1>Ejecutar app.py con PyScript</h1>
-  
-  <py-script>
-    from flask import Flask, render_template, request, redirect, session, url_for, send_from_directory, jsonify
+    <h1>Prueba de conexión a una IP</h1>
+    <p>Haz clic en el enlace para probar la conexión:</p>
+    <a href="http://90.173.253.105:5000">Conectar</a>
 
-    app = Flask(__name__)
-
-    @app.route('/')
-    def index():
-        return "¡Hola desde Flask!"
-
-    if __name__ == '__main__':
-        app.run()
-  </py-script>
+    <script>
+        function probarConexion() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "http://90.173.253.105:5000", true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    console.log("Conexión exitosa");
+                } else {
+                    console.log("Error de conexión");
+                }
+            };
+            xhr.send();
+        }
+        // Llama a la función para probar la conexión cuando se cargue la página
+        window.onload = probarConexion;
+    </script>
 </body>
 </html>
+
