@@ -11,18 +11,12 @@ mysql=MySQL()
 app.static_folder = 'static'
 
 
-<<<<<<< HEAD
-app.config['MYSQL_DATABASE_HOST']='192.168.18'
-=======
-app.config['MYSQL_DATABASE_HOST']='192.168.1.18'
->>>>>>> 028cfd29368b5397e8156054ea31ad61df3fe1ca
+app.config['MYSQL_DATABASE_HOST']='10.22.2.63'
 app.config['MYSQL_DATABASE_USER']='karolbayas'
 app.config['MYSQL_DATABASE_PASSWORD']='urjc2023'
 app.config['MYSQL_DATABASE_DB']='sitio'
 #app.config['MYSQL_DATABASE_DB']='admin'
 mysql.init_app(app)
-
-
 
 
 @app.route('/')
@@ -278,4 +272,4 @@ def favicon():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0' )
+    app.run(host='0.0.0.0')
