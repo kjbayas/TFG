@@ -30,17 +30,23 @@
       </button>
       <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
         <div class="navbar-nav">
-          <a class="nav-item nav-link" href="/">Home</a>
+          <a class="nav-item nav-link" href="/">Homeeeee</a>
           <a class="nav-item nav-link" href="/libros">Libros</a>
           <a class="nav-item nav-link" href="/nosotros">URJC</a>
           <a class="nav-item nav-link" href="/admin/login">Login</a>
         </div>
+
         <a class="navbar-brand" href="#">
             <img src="/img/logoURJC.png" alt="Logo">
         </a>
+        <a href="{{ url_for('cambiar_idioma', idioma='es') }}">Español</a>
+        <a href="{{ url_for('cambiar_idioma', idioma='en') }}">English</a>
+
+
       </div>
     </div>
   </nav>
+
 
     <br/>
 

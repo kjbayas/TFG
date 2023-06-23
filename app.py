@@ -2,21 +2,29 @@ import os # Nos permite enviar información
 from flask import Flask, render_template, request, redirect, session, url_for, send_from_directory, jsonify
 from flaskext.mysql import MySQL
 from datetime import datetime, timedelta
+from flask_babel import gettext, Babel
 import json
+
 
 
 app=Flask(__name__)
 app.secret_key= os.urandom(24)
 mysql=MySQL()
 app.static_folder = 'static'
+babel = Babel(app)
 
 
-app.config['MYSQL_DATABASE_HOST']='10.22.2.63'
+
+
+app.config['MYSQL_DATABASE_HOST']='192.168.1.18'
+#app.config['MYSQL_DATABASE_HOST']='10.22.2.63'
 app.config['MYSQL_DATABASE_USER']='karolbayas'
 app.config['MYSQL_DATABASE_PASSWORD']='urjc2023'
 app.config['MYSQL_DATABASE_DB']='sitio'
 #app.config['MYSQL_DATABASE_DB']='admin'
 mysql.init_app(app)
+
+
 
 
 @app.route('/')
@@ -39,8 +47,16 @@ def inicio():
 
     return render_template('sitio/index.html', nodos=nodos_json, enlaces=enlaces_json)
 
+# Idioma 
+def get_locale():
+    return session.get('idioma', 'es')
 
-    
+@app.route('/cambiar_idioma/<idioma>')
+def cambiar_idioma(idioma):
+    session['idioma'] = idioma
+    return redirect(request.referrer)
+
+
 # Añadimos estilos 
 @app.route('/css/<archivocss>') 
 def css_link(archivocss):
