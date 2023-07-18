@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.pie-pagina{
+    width: 100%;
+    background-color: rgb(235, 235, 249);
+}
+.pie-pagina .grupo-1{
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 50px;
+    padding: 45px 0px;
+}
+
+.pie-pagina .grupo-1 .box figure{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.pie-pagina .grupo-1 .box figure img{
+    width: 25px0;
+}
+
+.pie-pagina .grupo-1 .box h2{
+    margin-bottom: 25px;
+    font-size: 20px;
+}
+
+.pie-pagina .grupo-1 .box p{
+    color: rgb(73, 30, 30);
+    margin-bottom: 5px;
+}
+
+.pie-pagina .grupo-1 .red-social a{
+    display: inline-block;
+    text-decoration: none;
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    text-align: center;
+    transition: all 300ms ease;
+
+}
+
+.pie-pagina .grupo-1 .red-social a:hover{
+    color: rgb(242, 75, 75);
+}
+
+.pie-pagina .grupo-2 {
+    background-color: rgb(253, 246, 237);
+    padding: 15 px 10px;
+    text-align: center;
+}
+
+@media screen and (max-width:800px){
+    .pie-pagina .grupo-1{
+        width: 90%;
+        grid-template-columns: repeat(1, 1fr);
+        grid-gap: 30px;
+        padding: 35px 0px;
+    }
+}

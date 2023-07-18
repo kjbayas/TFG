@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    
     <title>Calendario</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -14,10 +13,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+</head>
+<body>
+    <br/>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Event List</h2>
+                <ul id="eventList"></ul>
+            </div>
+            <div class="col-md-6">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
 
-
-<script>
-    $(document).ready(function() {
+    <script>
+        // Obtener la variable "tiene_permiso" de tu backend para determinar si el usuario tiene permiso de edición
+        var editable = {{ tiene_permiso|lower }};
+        
+        // Obtener los eventos del calendario desde tu backend
         var events = [
             {% for event in calendar %}
             {
@@ -28,75 +43,84 @@
             },
             {% endfor %}
         ];
-        console.log('estos son eventos',events)
 
+        // Inicializar el calendario con las opciones adecuadas
         var calendar = $('#calendar').fullCalendar({
-            editable: true,
+            editable: editable,
             header: {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
             },
-            selectable: true,
-            selectHelper: true,
+            selectable: editable,
+            selectHelper: editable,
             select: function(start, end, allDay) {
-                var title = prompt("Enter Event Title");
-                if (title) {
-                    var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
-                    var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
+                if (editable) {
+                    var title = prompt("Enter Event Title");
+                    if (title) {
+                        
+                        var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
+                        var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
+                        $.ajax({
+                            url: "{{ url_for('insert') }}",
+                            type: "POST",
+                            data: { title: title, start: start, end: end },
+                            success: function(data) {
+                                alert(data);
+                                alert("Added Successfully");
+                                window.location.reload();
+                            }
+                        });
+                    }
+                }
+            },
+            eventResize: function(event) {
+                if (editable) {
+                    var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
+                    var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
+                    var title = event.title;
+                    var id = event.id;
                     $.ajax({
-                        url: "/insert",
+                        url: "{{ url_for('update') }}",
                         type: "POST",
-                        data: { title: title, start: start, end: end },
-                        success: function(data) {
-                            alert(data);
-                            alert("Added Successfully");
-                            window.location.replace("/nosotros");
+                        data: { title: title, start: start, end: end, id: id },
+                        success: function() {
+                            calendar.fullCalendar('refetchEvents');
+                            alert('Event Updated');
+                            window.location.reload();
                         }
                     });
                 }
             },
-            eventResize: function(event) {
-                var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
-                var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
-                var title = event.title;
-                var id = event.id;
-                $.ajax({
-                    url: "/update",
-                    type: "POST",
-                    data: { title: title, start: start, end: end, id: id },
-                    success: function() {
-                        calendar.fullCalendar('refetchEvents');
-                        alert('Event Updated');
-                    }
-                });
-            },
             eventDrop: function(event) {
-                var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
-                var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
-                var title = event.title;
-                var id = event.id;
-                $.ajax({
-                    url: "/update",
-                    type: "POST",
-                    data: { title: title, start: start, end: end, id: id },
-                    success: function() {
-                        calendar.fullCalendar('refetchEvents');
-                        alert('Event Updated');
-                    }
-                });
+                if (editable) {
+                    var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
+                    var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
+                    var title = event.title;
+                    var id = event.id;
+                    $.ajax({
+                        url: "{{ url_for('update') }}",
+                        type: "POST",
+                        data: { title: title, start: start, end: end, id: id },
+                        success: function() {
+                            calendar.fullCalendar('refetchEvents');
+                            alert('Event Updated');
+                            window.location.reload();
+                        }
+                    });
+                }
             },
             eventClick: function(event) {
-                if(confirm("Are you sure you want to remove it?")){
+                if (editable && confirm("Are you sure you want to remove it?")) {
                     var id =event.id;
                     $.ajax({
-                        url: "/ajax_delete",
+                        url: "{{ url_for('ajax_delete') }}",
                         type: "POST",
                         data: { id: id },
                         success: function() {
                             calendar.fullCalendar('refetchEvents');
                             alert('Event Removed');
-                            window.location.replace("/nosotros");
+                            window.location.reload();
                         }
                     })
                 }
@@ -104,19 +128,26 @@
             },
             events: events
         });
-    });
+        
+        // Cargar y mostrar los eventos en la lista
+        function loadEventList() {
+            var eventList = $('#eventList');
+            eventList.empty();
 
+            // Ordenar los eventos por fecha de inicio
+            events.sort(function(a, b) {
+                var dateA = moment(a.start).toDate();
+                var dateB = moment(b.start).toDate();
+                return dateA - dateB;
+            });
 
-</script>
-
-</head>
-<body>
-    <br/>
-    <h2 align="center"><a href="#">Calendario</a></h2>
-    <br/>
-    <div class="container">
-        <div id="calendar"></div>
-    
-    </div>
+            $.each(events, function(index, event) {
+                var startFormatted = moment(event.start).format("DD/MM/YYYY");
+                eventList.append('<li>' + event.title + ' - ' + startFormatted + '</li>');
+            });
+        }
+        
+        loadEventList();
+    </script>
 </body>
 </html>

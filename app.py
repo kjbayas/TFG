@@ -1,8 +1,8 @@
 import os # Nos permite enviar información
 from flask import Flask, render_template, request, redirect, session, url_for, send_from_directory, jsonify
 from flaskext.mysql import MySQL
+from flask_mail import Mail, Message
 from datetime import datetime, timedelta
-from flask_babel import gettext, Babel
 import json
 
 
@@ -11,20 +11,16 @@ app=Flask(__name__)
 app.secret_key= os.urandom(24)
 mysql=MySQL()
 app.static_folder = 'static'
-babel = Babel(app)
 
 
-
-
-app.config['MYSQL_DATABASE_HOST']='192.168.1.18'
 #app.config['MYSQL_DATABASE_HOST']='10.22.2.63'
+app.config['MYSQL_DATABASE_HOST']='192.168.1.18'
 app.config['MYSQL_DATABASE_USER']='karolbayas'
 app.config['MYSQL_DATABASE_PASSWORD']='urjc2023'
 app.config['MYSQL_DATABASE_DB']='sitio'
-#app.config['MYSQL_DATABASE_DB']='admin'
+
 mysql.init_app(app)
-
-
+mail = Mail(app)
 
 
 @app.route('/')
@@ -44,17 +40,8 @@ def inicio():
     print(enlaces_json)
 
     conexion.close()
+    return render_template('sitio/index.html' , nodos=nodos_json, enlaces=enlaces_json)
 
-    return render_template('sitio/index.html', nodos=nodos_json, enlaces=enlaces_json)
-
-# Idioma 
-def get_locale():
-    return session.get('idioma', 'es')
-
-@app.route('/cambiar_idioma/<idioma>')
-def cambiar_idioma(idioma):
-    session['idioma'] = idioma
-    return redirect(request.referrer)
 
 
 # Añadimos estilos 
@@ -81,14 +68,19 @@ def libros():
 
 @app.route('/nosotros')
 def nosotros():
-    conexion=mysql.connect() #conectadonos con la base de datos 
-    cursor= conexion.cursor()
+
+    id_rol = 0  # id_rol lo definimos como 0 para que solo pueda visualizar
+
+    tiene_permiso = False  # Otros roles no tienen permiso para editar
+
+    conexion = mysql.connect() # Conectándonos con la base de datos 
+    cursor = conexion.cursor()
     cursor.execute("SELECT id, title, str_to_date(start_event, '%Y-%m-%d %H:%i:%s'), str_to_date(end_event, '%Y-%m-%d %H:%i:%s') FROM events")
-    calendar=cursor.fetchall()
-    print(calendar)
+    calendar = cursor.fetchall()
     conexion.close()
 
-    return render_template('sitio/nosotros.html', calendar=calendar)
+    return render_template('sitio/nosotros.html', calendar=calendar, tiene_permiso=tiene_permiso)
+
 
 @app.route("/insert", methods=["POST", "GET"])
 def insert():
@@ -156,6 +148,26 @@ def admin_index():
         return redirect('/admin/login')
     return render_template('admin/index.html')
 
+@app.route('/admin/nosotros')
+def admin_nosotros():
+    # Verificar el rol del usuario actual
+    
+    id_rol = session['id_rol'] # Obtén el valor del rol del usuario actual desde tu sistema de autenticación
+
+    if id_rol == 1:  # Si el usuario tiene el rol de "admin"
+        tiene_permiso = True  # El usuario administrador tiene permiso para editar
+    else:
+        tiene_permiso = False  # Otros roles no tienen permiso para editar
+
+    conexion = mysql.connect() # Conectándonos con la base de datos 
+    cursor = conexion.cursor()
+    cursor.execute("SELECT id, title, str_to_date(start_event, '%Y-%m-%d %H:%i:%s'), str_to_date(end_event, '%Y-%m-%d %H:%i:%s') FROM events")
+    calendar = cursor.fetchall()
+    conexion.close()
+
+    return render_template('admin/nosotros.html', calendar=calendar, tiene_permiso=tiene_permiso)
+
+
 
 @app.route('/admin/cerrar')
 def admin_login_cerrar():
@@ -180,6 +192,9 @@ def admin_libros():
     
     return render_template('admin/libros.html', libros=libros,mensaje_error=mensaje_error)
 
+
+
+
 @app.route('/admin/login')
 def admin_login():
     return render_template('admin/login.html')
@@ -199,7 +214,12 @@ def admin_login_post():
     if login is not None :
         session['login']=True
         session['username']=login[1]
-        return redirect('/admin')
+        session['id_rol'] = login[4]
+
+        if session['id_rol'] == 0:
+            return redirect('/admin')
+        elif session['id_rol'] == 1:
+            return redirect('/admin')
     else:
         return render_template('admin/login.html', mensaje='Acceso Denegado' )
 
@@ -210,13 +230,12 @@ def admin_registro():
         username = request.form['txtUsuario']
         password = request.form['txtPassword']
         email = request.form['txtEmail']
-        tipo_usuario = request.form['txtTipoUsuario']
 
         # Guardar los datos en la base de datos
         conexion = mysql.connect()
         cursor = conexion.cursor()
-        query = "INSERT INTO login (username, password, email, tipo_usuario) VALUES (%s, %s, %s, %s)"
-        cursor.execute(query, (username, password, email, tipo_usuario))
+        query = "INSERT INTO login (username, password, email) VALUES (%s, %s, %s)"
+        cursor.execute(query, (username, password, email))
         conexion.commit()
         conexion.close()
 
@@ -287,5 +306,7 @@ def favicon():
     return '', 204
 
 
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')
