@@ -1,0 +1,49 @@
+{% include 'admin/cabecera.html' %}
+
+</br>
+
+<div class="container">
+    <div class="row">
+        <!-- Colocacion de los permisos -->
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <!--<th scope="col">ID</th>-->
+                            <th scope="col">USERNAME</th>
+                            <th scope="col">PASSWORD</th>
+                            <th scope="col">EMAIL</th>
+                            <th scope="col">ID_ROL</th>
+                            <th scope="col">ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for permiso in permisos %}
+                        <tr>
+                            <td>{{ permiso[1] }}</td>
+                            <td>{{ permiso[2] }}</td>
+                            <td>{{ permiso[3] }}</td>
+                            <td>
+                                <form method="POST" action="/admin/permisos/editar">
+                                    <select name="id_rol">
+                                        <option value="0" {% if permiso[4] == 0 %}selected{% endif %}>0</option>
+                                        <option value="1" {% if permiso[4] == 1 %}selected{% endif %}>1</option>
+                                    </select>
+                                    <input type="hidden" name="id" value="{{ permiso[0] }}">
+                                    <input type="hidden" name="password" value="{{ permiso[2] }}">
+                                    <input type="hidden" name="username" value="{{ permiso[1] }}">
+                                    <button type="submit">Guardar</button>
+                                </form>
+                            </td>
+                            <td>Acciones</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'admin/pie.html' %}

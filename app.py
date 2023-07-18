@@ -150,8 +150,10 @@ def admin_index():
 
 @app.route('/admin/nosotros')
 def admin_nosotros():
+     # Verificar si el usuario ha iniciado sesión
+    if 'login' not in session:
+        return redirect('/admin/login')  # Redireccionar al formulario de inicio de sesión si no ha iniciado sesión
     # Verificar el rol del usuario actual
-    
     id_rol = session['id_rol'] # Obtén el valor del rol del usuario actual desde tu sistema de autenticación
 
     if id_rol == 1:  # Si el usuario tiene el rol de "admin"
@@ -242,6 +244,57 @@ def admin_registro():
         return redirect('/admin/login')  # Redirigir al inicio de sesión después del registro exitoso
 
     return render_template('admin/registro.html')
+
+@app.route('/admin/permisos', methods=['GET', 'POST'])
+def admin_permisos():
+    if request.method == 'POST':
+        username = request.form['txtUsuario']
+        password = request.form['txtPassword']
+        email = request.form['txtEmail']
+        id_rol = request.form['txtIdRol']  # Obtener el valor del campo txtIdRol
+
+        # Guardar los datos en la base de datos
+        conexion = mysql.connect()
+        cursor = conexion.cursor()
+        query = "INSERT INTO login (username, password, email, id_rol) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query, (username, password, email, id_rol))
+        conexion.commit()
+        conexion.close()
+
+    # Verificar el acceso basado en el username
+    if 'username' in session and session['username'] == 'karolbayas':
+        # Obtener todos los datos de la tabla de permisos
+        conexion = mysql.connect()
+        cursor = conexion.cursor()
+        cursor.execute("SELECT * FROM login")
+        permisos = cursor.fetchall()
+        conexion.close()
+
+        return render_template('admin/permisos.html', permisos=permisos)
+
+    # Redirigir a la página anterior si no se cumple el requisito
+    return redirect(request.referrer or '/')
+
+@app.route('/admin/permisos/editar', methods=['POST'])
+def admin_permisos_editar():
+    if not 'login' in session:
+        return redirect('/admin/login')
+
+    username = request.form['username']
+    password = request.form['password']
+    id_rol = request.form['id_rol']
+
+    # Actualizar los campos en la base de datos
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
+    query = "UPDATE login SET password = %s, id_rol = %s WHERE username = %s"
+    cursor.execute(query, (password, id_rol, username))
+    conexion.commit()
+    conexion.close()
+
+    return redirect('/admin/permisos')
+
+
 
 
 @app.route('/admin/libros/guardar', methods=['POST'])
