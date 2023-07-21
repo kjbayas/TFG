@@ -10,33 +10,46 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <!--<th scope="col">ID</th>-->
                             <th scope="col">USERNAME</th>
                             <th scope="col">PASSWORD</th>
                             <th scope="col">EMAIL</th>
                             <th scope="col">ID_ROL</th>
-                            <th scope="col">ACCIONES</th>
+                            <th scope="col">ELIMINAR</th>
+                            <th scope="col">ACCESS</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for permiso in permisos %}
                         <tr>
                             <td>{{ permiso[1] }}</td>
-                            <td>{{ permiso[2] }}</td>
+                            <td>{{ permiso[2].encode().hex() }}</td>
                             <td>{{ permiso[3] }}</td>
                             <td>
                                 <form method="POST" action="/admin/permisos/editar">
-                                    <select name="id_rol">
-                                        <option value="0" {% if permiso[4] == 0 %}selected{% endif %}>0</option>
-                                        <option value="1" {% if permiso[4] == 1 %}selected{% endif %}>1</option>
+                                    <select name="id_rol" style="background-color: #f2f2f2; color: #333333; border: 1px solid #cccccc; padding: 8px; font-size: 14px;">                                        <option value="0" {% if permiso[4] == 0 %}selected {% endif %}>0</option>
+                                        <option value="1" {% if permiso[4] == 1 %}selected {% endif %}>1</option>
                                     </select>
                                     <input type="hidden" name="id" value="{{ permiso[0] }}">
                                     <input type="hidden" name="password" value="{{ permiso[2] }}">
                                     <input type="hidden" name="username" value="{{ permiso[1] }}">
-                                    <button type="submit">Guardar</button>
+                                    <input type="hidden" name="registro_pendiente" value="{{ permiso[5] }}">
+                                    <button type="submit" class="btn btn-warning">Save</button>
                                 </form>
                             </td>
-                            <td>Acciones</td>
+                            <td>
+                                <form method="GET" action="/admin/permisos/eliminar/{{ permiso[0] }}">
+                                    <button type="submit"class="btn btn-danger">Delete</button>
+                                </form>
+                            </td>
+                            <td>
+                                {% if permiso[5] == 1 %}
+                                    <form method="POST" action="/admin/permisos/aceptar/{{ permiso[0] }}">
+                                        <button type="submit" class="btn btn-success">Accept</button>
+                                    </form>
+                                {% else %}
+                                    Accepted
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -45,5 +58,6 @@
         </div>
     </div>
 </div>
+
 
 {% include 'admin/pie.html' %}

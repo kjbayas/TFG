@@ -38,7 +38,9 @@
             <a class="nav-item nav-link" href="nosotros">Calendar</a>
             <a class="nav-item nav-link" href="cerrar">Close</a>
             <a class="nav-item nav-link" href="/">Website </a>
-            <a class="nav-item nav-link" href="permisos">Permisos </a>
+            {% if 'username' in session and session['username'] == 'karolbayas' %}
+                <a class="nav-item nav-link" href="permisos">Permisos</a>
+            {% endif %}
         </div>
 
       </div>

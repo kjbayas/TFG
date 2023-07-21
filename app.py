@@ -11,17 +11,16 @@ app=Flask(__name__)
 app.secret_key= os.urandom(24)
 mysql=MySQL()
 app.static_folder = 'static'
+mail = Mail(app)
 
 
-#app.config['MYSQL_DATABASE_HOST']='10.22.2.63'
-app.config['MYSQL_DATABASE_HOST']='192.168.1.18'
+app.config['MYSQL_DATABASE_HOST']='10.22.2.63'
+#app.config['MYSQL_DATABASE_HOST']='192.168.1.18'
 app.config['MYSQL_DATABASE_USER']='karolbayas'
 app.config['MYSQL_DATABASE_PASSWORD']='urjc2023'
 app.config['MYSQL_DATABASE_DB']='sitio'
 
 mysql.init_app(app)
-mail = Mail(app)
-
 
 @app.route('/')
 def inicio():
@@ -42,22 +41,22 @@ def inicio():
     conexion.close()
     return render_template('sitio/index.html' , nodos=nodos_json, enlaces=enlaces_json)
 
-
-
-# Añadimos estilos 
+# Añadimos estilos de forma general 
 @app.route('/css/<archivocss>') 
 def css_link(archivocss):
     return send_from_directory(os.path.join('templates/sitio/css'),archivocss)
 
-# Esto es una carpeta donde se guardan las imagenes 
+# Almacenar Imagenes  
 @app.route('/img/<imagen>') 
 def imagenes(imagen):
     print(imagen)
     return send_from_directory(os.path.join('templates/sitio/img'),imagen)
 
+# llamada a la web de books 
 @app.route('/libros')
 def libros():
-    conexion=mysql.connect() #estamos conectadonos con la base de datos 
+
+    conexion=mysql.connect()  # Establecemos una conexion a la Base de datos
     cursor= conexion.cursor()
     cursor.execute("SELECT * FROM `libros`")
     libros=cursor.fetchall()
@@ -66,14 +65,14 @@ def libros():
 
     return render_template('sitio/libros.html', libros=libros)
 
+
 @app.route('/nosotros')
 def nosotros():
 
-    id_rol = 0  # id_rol lo definimos como 0 para que solo pueda visualizar
-
+    id_rol = 0  # id_rol lo definimos 0 para que solo pueda visualizar karolbayas
     tiene_permiso = False  # Otros roles no tienen permiso para editar
 
-    conexion = mysql.connect() # Conectándonos con la base de datos 
+    conexion = mysql.connect()  
     cursor = conexion.cursor()
     cursor.execute("SELECT id, title, str_to_date(start_event, '%Y-%m-%d %H:%i:%s'), str_to_date(end_event, '%Y-%m-%d %H:%i:%s') FROM events")
     calendar = cursor.fetchall()
@@ -81,7 +80,7 @@ def nosotros():
 
     return render_template('sitio/nosotros.html', calendar=calendar, tiene_permiso=tiene_permiso)
 
-
+# Empieza la llamada para insertar eventos en el calendario
 @app.route("/insert", methods=["POST", "GET"])
 def insert():
     conexion = mysql.connect()
@@ -113,10 +112,6 @@ def update():
         start = request.form['start']
         end = request.form['end']
         id = request.form['id']
-        print(title)
-        print(start)
-        print(end)
-        print(id)
         cursor.execute("UPDATE events SET title=%s, start_event=%s, end_event=%s WHERE id=%s", [title, start, end, id])
         conexion.commit()
         conexion.close()
@@ -150,26 +145,24 @@ def admin_index():
 
 @app.route('/admin/nosotros')
 def admin_nosotros():
-     # Verificar si el usuario ha iniciado sesión
+    # Verificar si se ha iniciado sesión
     if 'login' not in session:
         return redirect('/admin/login')  # Redireccionar al formulario de inicio de sesión si no ha iniciado sesión
     # Verificar el rol del usuario actual
     id_rol = session['id_rol'] # Obtén el valor del rol del usuario actual desde tu sistema de autenticación
 
-    if id_rol == 1:  # Si el usuario tiene el rol de "admin"
-        tiene_permiso = True  # El usuario administrador tiene permiso para editar
+    if id_rol == 1:  # Si el usuario tiene el rol = 1 "admin"
+        tiene_permiso = True  # Usuario administrador tiene permiso para editar
     else:
-        tiene_permiso = False  # Otros roles no tienen permiso para editar
+        tiene_permiso = False  # rol = 0 no tienen permiso para editar
 
-    conexion = mysql.connect() # Conectándonos con la base de datos 
+    conexion = mysql.connect() 
     cursor = conexion.cursor()
     cursor.execute("SELECT id, title, str_to_date(start_event, '%Y-%m-%d %H:%i:%s'), str_to_date(end_event, '%Y-%m-%d %H:%i:%s') FROM events")
     calendar = cursor.fetchall()
     conexion.close()
 
     return render_template('admin/nosotros.html', calendar=calendar, tiene_permiso=tiene_permiso)
-
-
 
 @app.route('/admin/cerrar')
 def admin_login_cerrar():
@@ -181,7 +174,7 @@ def admin_libros():
 
     if not 'login' in session:
         return redirect('/admin/login')
-    # Estamos conectadonos con la base de datos
+
     conexion=mysql.connect()  
     cursor= conexion.cursor()
     cursor.execute("SELECT * FROM `libros`")
@@ -189,12 +182,9 @@ def admin_libros():
     conexion.commit()
     print(libros)
 
-    # Obtener el mensaje de error si existe
     mensaje_error = request.args.get('mensaje_error')
     
     return render_template('admin/libros.html', libros=libros,mensaje_error=mensaje_error)
-
-
 
 
 @app.route('/admin/login')
@@ -203,45 +193,58 @@ def admin_login():
 
 @app.route('/admin/login', methods=['POST'])
 def admin_login_post():
-    username=request.form['txtUsuario']
-    password=request.form['txtPassword']
+    username = request.form['txtUsuario']
+    password = request.form['txtPassword']
 
-    conexion=mysql.connect()
-    cursor =conexion.cursor()
-    cursor.execute("SELECT * FROM login WHERE username =%s AND password =%s",(username, password))
-    login=cursor.fetchone()
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT * FROM login WHERE username = %s AND password = %s", (username, password))
+    login = cursor.fetchone()
     conexion.close()
-    print(login)
 
-    if login is not None :
-        session['login']=True
-        session['username']=login[1]
-        session['id_rol'] = login[4]
+    if login is not None:
+        if login[5] == 0:  # Verificar si el registro ha sido admitido (registro_pendiente = 0)
+            session['login'] = True
+            session['username'] = login[1]
+            session['id_rol'] = login[4]
 
-        if session['id_rol'] == 0:
-            return redirect('/admin')
-        elif session['id_rol'] == 1:
-            return redirect('/admin')
+            if session['id_rol'] == 0:
+                return redirect('/admin')
+            elif session['id_rol'] == 1:
+                return redirect('/admin')
+            else:
+                return render_template('admin/login.html', mensaje='Acceso Denegado usuario no creado')
+        else:
+            return render_template('admin/login.html', mensaje='Esperando confirmación')
     else:
-        return render_template('admin/login.html', mensaje='Acceso Denegado' )
+        return render_template('admin/login.html', mensaje='Acceso Denegado verifica credenciales')
+
 
 @app.route('/admin/registro', methods=['GET', 'POST'])
 def admin_registro():
     if request.method == 'POST':
-        # formulario de registro
+        # Formulario de registro
         username = request.form['txtUsuario']
         password = request.form['txtPassword']
         email = request.form['txtEmail']
-
-        # Guardar los datos en la base de datos
+        # Verificar si el nombre de usuario ya existe en la Base de Datos
         conexion = mysql.connect()
         cursor = conexion.cursor()
-        query = "INSERT INTO login (username, password, email) VALUES (%s, %s, %s)"
-        cursor.execute(query, (username, password, email))
+        query = "SELECT id FROM login WHERE username = %s"
+        cursor.execute(query, (username,))
+        existing_user = cursor.fetchone()
+
+        if existing_user: # Usuario ya existe en la base de datos, salta error y cierra la conexion 
+            conexion.close()
+            return render_template('admin/registro.html', error='USERNAME not valid')
+
+        # Guardar los datos en la base de datos
+        query = "INSERT INTO login (username, password, email, registro_pendiente) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query, (username, password, email, 1))
         conexion.commit()
         conexion.close()
 
-        return redirect('/admin/login')  # Redirigir al inicio de sesión después del registro exitoso
+        return redirect('/admin/login')  # Registro OK Redirigir al inicio de sesión
 
     return render_template('admin/registro.html')
 
@@ -252,12 +255,13 @@ def admin_permisos():
         password = request.form['txtPassword']
         email = request.form['txtEmail']
         id_rol = request.form['txtIdRol']  # Obtener el valor del campo txtIdRol
+        registro_pendiente = request.form['registro_pendiente']
 
         # Guardar los datos en la base de datos
         conexion = mysql.connect()
         cursor = conexion.cursor()
-        query = "INSERT INTO login (username, password, email, id_rol) VALUES (%s, %s, %s, %s)"
-        cursor.execute(query, (username, password, email, id_rol))
+        query = "INSERT INTO login (username, password, email, id_rol, registro_pendiente) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(query, (username, password, email, id_rol, registro_pendiente))
         conexion.commit()
         conexion.close()
 
@@ -283,18 +287,47 @@ def admin_permisos_editar():
     username = request.form['username']
     password = request.form['password']
     id_rol = request.form['id_rol']
+    registro_pendiente = request.form['registro_pendiente']
 
     # Actualizar los campos en la base de datos
     conexion = mysql.connect()
     cursor = conexion.cursor()
-    query = "UPDATE login SET password = %s, id_rol = %s WHERE username = %s"
-    cursor.execute(query, (password, id_rol, username))
+    query = "UPDATE login SET password = %s, id_rol = %s, registro_pendiente = %s WHERE username = %s"
+    cursor.execute(query, (password, id_rol, registro_pendiente, username))
     conexion.commit()
     conexion.close()
 
     return redirect('/admin/permisos')
 
+@app.route('/admin/permisos/eliminar/<int:id_permiso>', methods=['GET'])
+def admin_permisos_eliminar(id_permiso):
+    if not 'login' in session:
+        return redirect('/admin/login')
 
+    # Eliminar el permiso de la base de datos
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
+    query = "DELETE FROM login WHERE id = %s"
+    cursor.execute(query, (id_permiso,))
+    conexion.commit()
+    conexion.close()
+
+    return redirect('/admin/permisos')
+
+@app.route('/admin/permisos/aceptar/<int:id_permiso>', methods=['POST'])
+def admin_permisos_aceptar(id_permiso):
+    if not 'login' in session:
+        return redirect('/admin/login')
+
+    # Actualizar el valor de registro_pendiente a 0 en la base de datos
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
+    query = "UPDATE login SET registro_pendiente = 0 WHERE id = %s"
+    cursor.execute(query, (id_permiso,))
+    conexion.commit()
+    conexion.close()
+
+    return redirect('/admin/permisos')
 
 
 @app.route('/admin/libros/guardar', methods=['POST'])
@@ -311,7 +344,6 @@ def admin_libros_guardar():
     if not _nombre or not _url or not _archivo:
         mensaje_error = 'Por favor, rellene todos los campos.'
         return redirect(url_for('admin_libros', mensaje_error=mensaje_error))
-
 
     tiempo=datetime.now()
     horaActual=tiempo.strftime('%Y%H%M%S')
