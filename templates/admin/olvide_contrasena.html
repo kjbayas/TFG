@@ -1,0 +1,33 @@
+    {% include 'admin/cabecera.html' %}
+
+    <!DOCTYPE html>
+    <html lang="en">
+    
+    <head>
+      <title>Login del administrador</title>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    </head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <h2>Restablecer Contraseña</h2>
+                {% if mensaje %}
+                <div class="alert alert-success">{{ mensaje }}</div>
+                {% endif %}
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo Electrónico</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar Correo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

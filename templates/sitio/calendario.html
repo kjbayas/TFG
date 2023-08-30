@@ -19,8 +19,8 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-                <h2>Event List</h2>
-                <ul id="eventList"></ul>
+                <h2 class="text-center">Event List</h2>
+                <div class="list-group" id="eventList"></div>
             </div>
             <div class="col-md-6">
                 <div id="calendar"></div>
@@ -29,125 +29,89 @@
     </div>
 
     <script>
-        // Obtener la variable "tiene_permiso" de tu backend para determinar si el usuario tiene permiso de edición
-        var editable = {{ tiene_permiso|lower }};
-        
-        // Obtener los eventos del calendario desde tu backend
         var events = [
             {% for event in calendar %}
             {
-                id: '{{ event[0] }}',
                 title: '{{ event[1] }}',
-                start: '{{ event[2].strftime("%Y-%m-%dT%H:%M:%S") }}',
-                end: '{{ event[3].strftime("%Y-%m-%dT%H:%M:%S") }}'
+                place:  '{{ event[2] }}',
+                start: '{{ event[3].strftime("%Y-%m-%d") }}',
+                end: '{{ event[4].strftime("%Y-%m-%d") }}'
             },
             {% endfor %}
         ];
 
-        // Inicializar el calendario con las opciones adecuadas
+        // Inicializar el calendario
         var calendar = $('#calendar').fullCalendar({
-            editable: editable,
             header: {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
             },
-            selectable: editable,
-            selectHelper: editable,
-            select: function(start, end, allDay) {
-                if (editable) {
-                    var title = prompt("Enter Event Title");
-                    if (title) {
-                        
-                        var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
-                        var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
-                        $.ajax({
-                            url: "{{ url_for('insert') }}",
-                            type: "POST",
-                            data: { title: title, start: start, end: end },
-                            success: function(data) {
-                                alert(data);
-                                alert("Added Successfully");
-                                window.location.reload();
-                            }
-                        });
-                    }
-                }
-            },
-            eventResize: function(event) {
-                if (editable) {
-                    var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
-                    var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
-                    var title = event.title;
-                    var id = event.id;
-                    $.ajax({
-                        url: "{{ url_for('update') }}",
-                        type: "POST",
-                        data: { title: title, start: start, end: end, id: id },
-                        success: function() {
-                            calendar.fullCalendar('refetchEvents');
-                            alert('Event Updated');
-                            window.location.reload();
-                        }
-                    });
-                }
-            },
-            eventDrop: function(event) {
-                if (editable) {
-                    var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
-                    var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
-                    var title = event.title;
-                    var id = event.id;
-                    $.ajax({
-                        url: "{{ url_for('update') }}",
-                        type: "POST",
-                        data: { title: title, start: start, end: end, id: id },
-                        success: function() {
-                            calendar.fullCalendar('refetchEvents');
-                            alert('Event Updated');
-                            window.location.reload();
-                        }
-                    });
-                }
-            },
-            eventClick: function(event) {
-                if (editable && confirm("Are you sure you want to remove it?")) {
-                    var id =event.id;
-                    $.ajax({
-                        url: "{{ url_for('ajax_delete') }}",
-                        type: "POST",
-                        data: { id: id },
-                        success: function() {
-                            calendar.fullCalendar('refetchEvents');
-                            alert('Event Removed');
-                            window.location.reload();
-                        }
-                    })
-                }
-                alert('Event clicked: ' + event.title);
-            },
             events: events
         });
-        
+
+        // Filtrar eventos futuros y eventos de hoy
+        var today = moment().startOf('day');
+        var futureAndTodayEvents = events.filter(function(event) {
+            var eventStartDate = moment(event.start, "YYYY-MM-DD");
+            return eventStartDate.isSameOrAfter(today);
+        });
+
         // Cargar y mostrar los eventos en la lista
         function loadEventList() {
             var eventList = $('#eventList');
             eventList.empty();
 
-            // Ordenar los eventos por fecha de inicio
-            events.sort(function(a, b) {
-                var dateA = moment(a.start).toDate();
-                var dateB = moment(b.start).toDate();
+            var listHeader = `
+                <a href="#" class="list-group-item list-group-item-action active">
+                    <div class="row">
+                        <div class="col-md-4"><strong>Title</strong></div>
+                        <div class="col-md-4"><strong>Date and Time</strong></div>
+                        <div class="col-md-4"><strong>Place</strong></div>
+                    </div>
+                </a>`;
+            eventList.append(listHeader);
+
+            futureAndTodayEvents.sort(function(a, b) {
+                var dateA = moment(a.start, "YYYY-MM-DD").toDate();
+                var dateB = moment(b.start, "YYYY-MM-DD").toDate();
                 return dateA - dateB;
             });
 
-            $.each(events, function(index, event) {
-                var startFormatted = moment(event.start).format("DD/MM/YYYY");
-                eventList.append('<li>' + event.title + ' - ' + startFormatted + '</li>');
+            $.each(futureAndTodayEvents, function(index, event) {
+                var startFormatted = moment(event.start).format("DD/MM/YYYY HH:mm"); // Agregar la hora
+                var listItem = `
+                    <a href="#" class="list-group-item list-group-item-action ${event.isToday ? 'list-group-item-danger' : ''}">
+                        <div class="row">
+                            <div class="col-md-4">${event.title}</div>
+                            <div class="col-md-3">${startFormatted}</div>
+                            <div class="col-md-3">${event.place}</div>
+                        </div>
+                    </a>`;
+                eventList.append(listItem);
             });
+
         }
-        
-        loadEventList();
+
+        // Resaltar evento del día
+        function highlightTodayEvent() {
+            var todayEvent = futureAndTodayEvents.find(function(event) {
+                var eventStartDate = moment(event.start, "YYYY-MM-DD").startOf('day');
+                return eventStartDate.isSame(today);
+            });
+
+            if (todayEvent) {
+                todayEvent.isToday = true;
+            }
+        }
+
+        // Cargar los eventos en la lista y resaltar el evento del día cuando el DOM esté listo
+        $(document).ready(function() {
+            loadEventList();
+            highlightTodayEvent();
+            loadEventList(); // Llamar a loadEventList nuevamente después de resaltar el evento del día
+        });
+
     </script>
 </body>
 </html>

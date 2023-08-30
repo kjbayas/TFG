@@ -26,9 +26,17 @@
       </button>
       <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
         <div class="navbar-nav">
-          <a class="nav-item nav-link" href="/">Home</a>
-          <a class="nav-item nav-link" href="/libros">Books</a>
-          <a class="nav-item nav-link" href="/nosotros">Calendar</a>
+          <a class="nav-item nav-link" title="Home" href="/">Home</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Pages
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li><a class="dropdown-item" alt="Books" href="/libros">Books</a></li>
+              <li><a class="dropdown-item" href="/nosotros">Calendar</a></li>
+            </ul>
+          </li>
+          <a class="nav-item nav-link" alt="Cslendar" href="/nosotros">Calendar</a>
           <a class="nav-item nav-link" href="/admin/login">Login</a>
         </div>
 
@@ -36,5 +44,6 @@
     </div>
   </nav>
 
-
     <br/>
+</body>
+</html>

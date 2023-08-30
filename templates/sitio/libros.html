@@ -1,29 +1,33 @@
 {% include 'sitio/cabecera.html' %}
-    <style>
-        body {
-            margin: 20px; /* Establece el margen deseado */
-        }
-        .card-img-top {
-            margin-top: 20px;
-            width: 200px; /* Establece la anchura deseada */
-            height: 300px; /* Establece la altura deseada */
-        }
-    </style>
 
-    <div class="row">
-        {% for libro in libros %}
-        <div class="col-md-2">
-            <div class="card text-center" >
-                <img class="card-img-top mx-auto" src="/img/{{libro[2]}}" alt="Title">
-                <div class="card-body">
-                    <p class="card-text">
-                        <a name="" id="" class="btn btn-outline-success" href="{{libro[3]}}" role="button">{{libro[1]}}</a>
-                    </p>
-                </div>
+<style>
+    body {
+        margin: 20px;
+    }
+    .card-img-top {
+        margin-top: 20px;
+        width: 200px;
+        height: 300px;
+    }
+    /* Estilo para aplicar escala de grises */
+    .img-grayscale {
+        filter: grayscale(100%);
+    }
+</style>
+
+<div class="row">
+    {% for libro in libros %}
+    <div class="col-md-2">
+        <div class="card text-center">
+            <img class="card-img-top mx-auto img-grayscale" src="/img/{{libro[2]}}" alt="Title">
+            <div class="card-body">
+                <p class="card-text">
+                    <a name="" id="" class="btn btn-outline-success" href="{{libro[3]}}" role="button">{{libro[1]}}</a>
+                </p>
             </div>
         </div>
-        {% endfor %}
     </div>
-
+    {% endfor %}
+</div>
 
 {% include 'sitio/pie.html' %}

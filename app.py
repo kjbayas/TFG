@@ -4,6 +4,10 @@ from flaskext.mysql import MySQL
 from flask_mail import Mail, Message
 from datetime import datetime, timedelta
 import json
+import random
+import string
+import logging
+from logging.handlers import RotatingFileHandler
 
 
 
@@ -11,16 +15,24 @@ app=Flask(__name__)
 app.secret_key= os.urandom(24)
 mysql=MySQL()
 app.static_folder = 'static'
+app.config['MAIL_SERVER'] = 'smtp.example.com'
+app.config['MAIL_PORT'] = 587  # Puerto para TLS
+app.config['MAIL_USE_TLS'] = True  # Usar TLS
+app.config['MAIL_USERNAME'] = 'karolbayas@gmail.com'
+app.config['MAIL_PASSWORD'] = '123'
+
 mail = Mail(app)
 
 
-app.config['MYSQL_DATABASE_HOST']='10.22.2.63'
-#app.config['MYSQL_DATABASE_HOST']='192.168.1.18'
+#app.config['MYSQL_DATABASE_HOST']='10.22.2.63'
+app.config['MYSQL_DATABASE_HOST']='192.168.1.17'
 app.config['MYSQL_DATABASE_USER']='karolbayas'
 app.config['MYSQL_DATABASE_PASSWORD']='urjc2023'
 app.config['MYSQL_DATABASE_DB']='sitio'
 
 mysql.init_app(app)
+
+
 
 @app.route('/')
 def inicio():
@@ -74,13 +86,13 @@ def nosotros():
 
     conexion = mysql.connect()  
     cursor = conexion.cursor()
-    cursor.execute("SELECT id, title, str_to_date(start_event, '%Y-%m-%d %H:%i:%s'), str_to_date(end_event, '%Y-%m-%d %H:%i:%s') FROM events")
+    cursor.execute("SELECT id, title, place, str_to_date(start_event, '%Y-%m-%d %H:%i:%s'), str_to_date(end_event, '%Y-%m-%d %H:%i:%s') FROM events")
     calendar = cursor.fetchall()
     conexion.close()
 
     return render_template('sitio/nosotros.html', calendar=calendar, tiene_permiso=tiene_permiso)
 
-# Empieza la llamada para insertar eventos en el calendario
+# Insertar eventos en el calendario
 @app.route("/insert", methods=["POST", "GET"])
 def insert():
     conexion = mysql.connect()
@@ -89,12 +101,13 @@ def insert():
     
     if request.method == 'POST':
         title = request.form['title']
+        place = request.form['place']
         start = request.form['start']
         end = request.form['end']
         print(title)
         print(start)
         print(end)
-        cursor.execute("INSERT INTO events (title, start_event, end_event) VALUES (%s, %s, %s)", [title, start, end])
+        cursor.execute("INSERT INTO events (title, place, start_event, end_event) VALUES (%s, %s, %s, %s)", [title, place, start, end])
         conexion.commit()
         conexion.close()
         msg = 'success'
@@ -109,10 +122,11 @@ def update():
     
     if request.method == 'POST':
         title = request.form['title']
+        place = request.form['place']
         start = request.form['start']
         end = request.form['end']
         id = request.form['id']
-        cursor.execute("UPDATE events SET title=%s, start_event=%s, end_event=%s WHERE id=%s", [title, start, end, id])
+        cursor.execute("UPDATE events SET title=%s, place=%s, start_event=%s, end_event=%s WHERE id=%s", [title, place, start, end, id])
         conexion.commit()
         conexion.close()
         msg = 'success'
@@ -158,7 +172,7 @@ def admin_nosotros():
 
     conexion = mysql.connect() 
     cursor = conexion.cursor()
-    cursor.execute("SELECT id, title, str_to_date(start_event, '%Y-%m-%d %H:%i:%s'), str_to_date(end_event, '%Y-%m-%d %H:%i:%s') FROM events")
+    cursor.execute("SELECT id, title, place, str_to_date(start_event, '%Y-%m-%d %H:%i:%s'), str_to_date(end_event, '%Y-%m-%d %H:%i:%s') FROM events")
     calendar = cursor.fetchall()
     conexion.close()
 
@@ -248,6 +262,69 @@ def admin_registro():
 
     return render_template('admin/registro.html')
 
+# Token para restablecer la contraseña
+def generate_reset_token():
+    token = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(64))
+    return token
+
+
+@app.route('/admin/olvide-contrasena', methods=['GET', 'POST'])
+def olvide_contrasena():
+    if request.method == 'POST':
+        email = request.form['email']
+        token = generate_reset_token()  # Generar un token seguro para restablecer la contraseña
+
+        # Guardar el token en la base de datos (puedes usar la misma base de datos o una tabla diferente)
+        conexion = mysql.connect()
+        cursor = conexion.cursor()
+        cursor.execute("INSERT INTO reset_tokens (email, token) VALUES (%s, %s)", (email, token))
+        conexion.commit()
+        conexion.close()
+
+        # Crear y enviar el correo electrónico
+        enlace_para_resetear_contrasena = url_for('restablecer_contrasena', token=token, _external=True)
+        msg = Message('Restablecimiento de contraseña', sender='karolbayas@gmail.com', recipients=[email])
+        msg.body = f'Haz clic en el enlace para restablecer tu contraseña: {enlace_para_resetear_contrasena}'
+
+    try:
+        mail.send(msg)
+        mensaje = "Se ha enviado un correo con instrucciones para restablecer la contraseña."
+        return render_template('/admin/login.html', mensaje=mensaje)
+    except Exception as e:
+        mensaje = "Ha ocurrido un error al enviar el correo. Por favor, inténtalo más tarde."
+        return render_template('/admin/olvide_contrasena.html', mensaje=mensaje)
+
+
+# Ruta para restablecer la contraseña
+@app.route('/admin/restablecer-contrasena/<token>', methods=['GET', 'POST'])
+def restablecer_contrasena(token):
+    if request.method == 'POST':
+        nueva_contrasena = request.form['nueva_contrasena']
+        
+        # Verificar el token en la base de datos
+        conexion = mysql.connect()
+        cursor = conexion.cursor()
+        cursor.execute("SELECT email FROM reset_tokens WHERE token = %s", (token,))
+        resultado = cursor.fetchone()
+        
+        if resultado:
+            # Actualizar la contraseña en la base de datos (puedes usar la misma tabla de usuarios)
+            cursor.execute("UPDATE usuarios SET password = %s WHERE email = %s", (nueva_contrasena, resultado[0]))
+            conexion.commit()
+            # Eliminar el token de la base de datos después de usarlo
+            cursor.execute("DELETE FROM reset_tokens WHERE token = %s", (token,))
+            conexion.commit()
+            conexion.close()
+            
+            mensaje = "Contraseña restablecida con éxito. Ahora puedes iniciar sesión con tu nueva contraseña."
+            return render_template('/admin/login.html', mensaje=mensaje)
+        else:
+            mensaje = "El token no es válido. Por favor, solicita otro restablecimiento de contraseña."
+            return render_template('/admin/login.html', mensaje=mensaje)
+
+    return render_template('/admin/restablecer_contrasena.html', token=token)
+
+
 @app.route('/admin/permisos', methods=['GET', 'POST'])
 def admin_permisos():
     if request.method == 'POST':
@@ -298,6 +375,8 @@ def admin_permisos_editar():
     conexion.close()
 
     return redirect('/admin/permisos')
+
+
 
 @app.route('/admin/permisos/eliminar/<int:id_permiso>', methods=['GET'])
 def admin_permisos_eliminar(id_permiso):
@@ -392,6 +471,11 @@ def favicon():
 
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
+if not app.debug:
+    handler = RotatingFileHandler('app.log', maxBytes=100000, backupCount=10)
+    handler.setLevel(logging.INFO)
+    app.logger.addHandler(handler)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

@@ -1,2 +1,272 @@
 {% include 'admin/cabecera.html' %}
-{% include 'sitio/calendario.html' %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calendario</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <!-- Bootstrap CSS v5.2.1 --> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+    <style>
+        .h2-centered {
+        text-align: center;
+        }
+        .container-separator {
+            margin-top: 70px;
+        }
+    </style>
+</head>
+<body>
+    <br/>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2>Create Event</h2>
+                <form id="eventForm">
+                    <div class="mb-3">
+                        <label for="eventTitle" class="form-label">Event Title</label>
+                        <input type="text" class="form-control" id="eventTitle" name="eventTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventStart" class="form-label">Event Start</label>
+                        <input type="datetime-local" class="form-control" id="eventStart" name="eventStart" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventEnd" class="form-label">Event End</label>
+                        <input type="datetime-local" class="form-control" id="eventEnd" name="eventEnd" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventPlace" class="form-label">Event Place</label>
+                        <input type="text" class="form-control" id="eventPlace" name="eventPlace" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Event</button>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+    <div class="container-separator"></div>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <h2 class="h2-centered">Event List</h2>
+                <ul id="eventList" class="list-group"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Obtener la variable "tiene_permiso" de tu backend para determinar si el usuario tiene permiso de edición
+        var editable = {{ tiene_permiso|lower }};
+        
+        // Obtener los eventos del calendario desde tu backend
+        var events = [
+            {% for event in calendar %}
+            {
+                id: '{{ event[0] }}',
+                title: '{{ event[1] }}',
+                place: '{{ event[2] }}',
+                start: '{{ event[3].strftime("%Y-%m-%dT%H:%M:%S") }}',
+                end: '{{ event[4].strftime("%Y-%m-%dT%H:%M:%S") }}',
+            },
+            {% endfor %}
+        ];
+
+        // Manejar el envío del formulario para crear eventos
+        $('#eventForm').submit(function(event) {
+            event.preventDefault(); // Evitar el envío por defecto del formulario
+
+            var title = $('#eventTitle').val();
+            var start = $('#eventStart').val();
+            var end = $('#eventEnd').val();
+            var place = $('#eventPlace').val(); // Capturar el valor del campo "place"
+
+            $.ajax({
+                url: "{{ url_for('insert') }}",
+                type: "POST",
+                data: {
+                    title: title,
+                    start: start,
+                    end: end,
+                    place: place // Incluir el campo "place" en los datos enviados
+                },
+                success: function(data) {
+                    alert(data);
+                    alert("Event Created Successfully");
+                    window.location.reload();
+                }
+            });
+        });
+
+        // Inicializar el calendario con las opciones adecuadas
+        var calendar = $('#calendar').fullCalendar({
+            editable: editable,
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            selectable: editable,
+            selectHelper: editable,
+            select: function(start, end, allDay) {
+                if (editable) {
+                    var title = prompt("Enter Event Title");
+                    var place = prompt("Enter Event Place");
+                    if (title  && place) {
+                        
+                        var start = $.fullCalendar.formatDate(start, "Y-MM-DD HH:mm:ss");
+                        var end = $.fullCalendar.formatDate(end, "Y-MM-DD HH:mm:ss");
+                        $.ajax({
+                            url: "{{ url_for('insert') }}",
+                            type: "POST",
+                            data: { title: title, place: place, start: start, end: end },
+                            success: function(data) {
+                                alert(data);
+                                alert("Added Successfully");
+                                window.location.reload();
+                            }
+                        });
+                    }
+                }
+            },
+            eventClick: function(event) {
+                if (editable) {
+                    var newTitle = prompt("Enter New Title", event.title);
+                    var newPlace = prompt("Enter New Place", event.place);
+
+                    if (newTitle !== null && newPlace !== null) {
+                        var newStart = prompt("Enter New Start Date and Time (YYYY-MM-DD HH:mm:ss)", event.start.format("YYYY-MM-DD HH:mm:ss"));
+                        var newEnd = prompt("Enter New End Date and Time (YYYY-MM-DD HH:mm:ss)", event.end.format("YYYY-MM-DD HH:mm:ss"));
+
+                        if (newStart !== null && newEnd !== null) {
+                            var id = event.id;
+                            $.ajax({
+                                url: "{{ url_for('update') }}",
+                                type: "POST",
+                                data: {
+                                    id: id,
+                                    title: newTitle,
+                                    place: newPlace,
+                                    start: newStart,
+                                    end: newEnd
+                                },
+                                success: function() {
+                                    calendar.fullCalendar('refetchEvents');
+                                    alert('Event Updated');
+                                    window.location.reload();
+                                }
+                            });
+                        }
+                    }
+                }
+            },
+
+            eventDrop: function(event) {
+                if (editable) {
+                    var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
+                    var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
+                    var title = event.title;
+                    var place = event.place; // Agregado: Capturar el valor de "place"
+                    var id = event.id;
+                    $.ajax({
+                        url: "{{ url_for('update') }}",
+                        type: "POST",
+                        data: { title: title, place: place, start: start, end: end, id: id },
+                        success: function() {
+                            calendar.fullCalendar('refetchEvents');
+                            alert('Event Updated');
+                            window.location.reload();
+                            loadEventList();
+                        }
+                    });
+                }
+            },
+
+
+            events: events
+        });
+        
+        // Cargar y mostrar los eventos en la lista
+        function loadEventList() {
+            var eventList = $('#eventList');
+            eventList.empty();
+
+            var columnHeader = `
+            <a href="#" class="list-group-item list-group-item-action active text-center">
+                <div class="row">
+                    <div class="col-md-4"><strong>Title</strong></div>
+                    <div class="col-md-2"><strong>Date-Start</strong></div>
+                    <div class="col-md-2"><strong>Date-End</strong></div>
+                    <div class="col-md-2"><strong>Place</strong></div>
+                    <div class="col-md-2"><strong>Action</strong></div>
+                </div>
+            </a>`;
+            eventList.append(columnHeader);
+
+            // Ordenar los eventos por fecha de inicio
+            events.sort(function(a, b) {
+                var dateA = moment(a.start).toDate();
+                var dateB = moment(b.start).toDate();
+                return dateA - dateB;
+            });
+
+
+            // Filtrar eventos para mostrar solo los del día de hoy y futuros
+            var today = moment().startOf('day');
+            var futureEvents = events.filter(function(event) {
+                return moment(event.start) >= today;
+            });
+
+            futureEvents.sort(function(a, b) {
+                var dateA = moment(a.start).toDate();
+                var dateB = moment(b.start).toDate();
+                return dateA - dateB;
+            });
+
+            $.each(futureEvents, function(index, event) {
+                var startFormatted = moment(event.start).format("DD/MM/YYYY HH:mm");
+                var endFormatted = moment(event.end).format("DD/MM/YYYY HH:mm");
+                var deleteButton = '<button class="btn btn-danger" onclick="deleteEvent(' + event.id + ')">Delete</button>';
+                var eventListItem = `
+                    <li class="list-group-item text-center">
+                        <div class="row">
+                            <div class="col-md-4">${event.title}</div>
+                            <div class="col-md-2">${startFormatted}</div>
+                            <div class="col-md-2">${endFormatted}</div>
+                            <div class="col-md-2">${event.place}</div>
+                            <div class="col-md-2">${deleteButton}</div>
+                        </div>
+                    </li>`;
+                eventList.append(eventListItem);
+            });
+        }
+        // Función para eliminar un evento
+        function deleteEvent(eventId) {
+            if (confirm("Are you sure you want to delete this event?")) {
+                $.ajax({
+                    url: "{{ url_for('ajax_delete') }}",
+                    type: "POST",
+                    data: { id: eventId },
+                    success: function() {
+                        calendar.fullCalendar('removeEvents', eventId);
+                        alert('Event Removed');
+                        loadEventList(); 
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+        loadEventList();
+    </script>
+</body>
+</html>
+

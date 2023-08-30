@@ -12,9 +12,19 @@
                 <div class="card-body">
                    <form action="/admin/libros/guardar" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
-                          <label for="" class="form-label">Nombre:</label>
+                          <label for="" class="form-label">Name:</label>
                           <input type="text"
                             class="form-control" name="txtNombre" id="txtNombre" aria-describedby="helpId" placeholder="Escriba el nombre del libro">
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Autor:</label>
+                            <input type="text"
+                              class="form-control" name="txtNombre" id="txtNombre" aria-describedby="helpId" placeholder="Escriba el nombre del libro">
+                        </div>
+                        <div class="mb-3">
+                            <label for="" class="form-label">Clasificacion:</label>
+                            <input type="text"
+                              class="form-control" name="txtNombre" id="txtNombre" aria-describedby="helpId" placeholder="Escriba el nombre del libro">
                         </div>
                         <div class="mb-3">
                           <label for="" class="form-label">Imagen:</label>
@@ -59,8 +69,8 @@
                             <!--<th scope="col">ID</th>-->
                             <td>{{libro[1]}}</td>
                             <td>
-                                <img width="120" src="/img/{{libro[2]}}" class="img-fluid rounded-top" alt="">
-                            </td>
+                                <img width="120" src="/img/{{libro[2]}}" class="img-fluid rounded-top img-grayscale" alt="">
+                            </td>                            
                             <td>
                                 
                                 <a name="" id="" class="btn btn-light" href="{{libro[3]}}" role="button">{{libro[1]}}</a>
