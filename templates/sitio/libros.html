@@ -9,12 +9,19 @@
         width: 200px;
         height: 300px;
     }
-    /* Estilo para aplicar escala de grises */
+    /* Estilo para aplicar escala de grises a imagenes*/
     .img-grayscale {
         filter: grayscale(100%);
     }
+    .card-column {
+        margin-bottom: 20px; /* Espacio entre las filas */
+    }
+
 </style>
-<form action="/sitio/libros" method="GET">
+
+<button id="toggleFormBtn" class="btn btn-primary mb-3">Search Form</button>
+
+<form id="filterForm" action="/sitio/libros" method="GET" style="display: none;">
     <div class="mb-3">
         <label for="selectYear">Select Year:</label>
         <select id="selectYear" name="year" class="form-select">
@@ -51,12 +58,12 @@
 <br>
 <div class="row">
     {% for libro in libros %}
-    <div class="col-md-2">
+    <div class="col-md-2 card-column">
         <div class="card text-center">
             <img class="card-img-top mx-auto img-grayscale" src="/img/{{libro[2]}}" alt="Title">
             <div class="card-body">
                 <p class="card-text">
-                    <a name="" id="" class="btn btn-outline-success" href="{{libro[3]}}" role="button">{{libro[1]}}</a>
+                    <a name="" id="" class="btn btn-outline-dark" href="{{libro[3]}}" role="button">{{libro[1]}}</a>
                 </p>
             </div>
         </div>
@@ -65,3 +72,18 @@
 </div>
 
 {% include 'sitio/pie.html' %}
+
+<script>
+    const toggleFormBtn = document.getElementById("toggleFormBtn");
+    const filterForm = document.getElementById("filterForm");
+
+    toggleFormBtn.addEventListener("click", function () {
+        if (filterForm.style.display === "none" || filterForm.style.display === "") {
+            filterForm.style.display = "block";
+            toggleFormBtn.textContent = "Ocultar formulario";
+        } else {
+            filterForm.style.display = "none";
+            toggleFormBtn.textContent = "Mostrar formulario";
+        }
+    });
+</script>

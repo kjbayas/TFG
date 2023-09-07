@@ -7,7 +7,7 @@ from logging.handlers import RotatingFileHandler
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, session, url_for, send_from_directory, jsonify
 from flaskext.mysql import MySQL
-from flask_mail import Mail
+from flask_mail import Mail, Message
 from config import Config 
 
 app = Flask(__name__)

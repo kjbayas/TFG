@@ -1,34 +1,44 @@
-    {% include 'admin/cabecera.html' %}
+{% include 'admin/cabecera.html' %}
 
-    <!DOCTYPE html>
-    <html lang="en">
-    
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Restablecer Contraseña</title>
-        <!-- Agrega tus enlaces a archivos CSS si los necesitas -->
-    </head>
-    
-    <body>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 offset-md-3">
-                    <h2>Restablecer Contraseña</h2>
-                    {% if mensaje %}
-                    <div class="alert alert-success">{{ mensaje }}</div>
-                    {% endif %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password</title>
+
+    <style>
+        .container {
+            margin-top: 50px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3 mb-3">
+                <h1>Reset Password</h1>
+                {% if mensaje %}
+                <div class="alert alert-success">{{ mensaje }}</div>
+                {% endif %}
+            </div>
+            <div class="col-md-6 offset-md-3 mb-3">
+                <div class="d-grid gap-2 col-6 mx-auto">
                     <form method="POST" action="/admin/olvide-contrasena">
-                        <!-- Otros campos del formulario -->
-                        <input type="email" name="email" placeholder="Correo electrónico" required>
-                        <!-- Otros campos del formulario -->
-                        <button type="submit">Enviar</button>
+                        <input type="email" name="email" class="form-control" placeholder="Email address" required>
+                        <div class="d-grid gap-2 col-6 mx-auto">
+                            <br>
+                            <button type="submit" class="btn btn-outline-success">Send</button>
+                        </div>
                     </form>
-                    
                 </div>
             </div>
         </div>
-    </body>
-    
-    </html>
-    
+    </div>
+</body>
+
+</html>
+
