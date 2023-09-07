@@ -1,37 +1,23 @@
-import os # Nos permite enviar información
-from flask import Flask, render_template, request, redirect, session, url_for, send_from_directory, jsonify
-from flaskext.mysql import MySQL
-from flask_mail import Mail, Message
-from datetime import datetime, timedelta
+import os
 import json
 import random
 import string
 import logging
 from logging.handlers import RotatingFileHandler
+from datetime import datetime, timedelta
+from flask import Flask, render_template, request, redirect, session, url_for, send_from_directory, jsonify
+from flaskext.mysql import MySQL
+from flask_mail import Mail
+from config import Config 
 
-
-
-app=Flask(__name__)
-app.secret_key= os.urandom(24)
-mysql=MySQL()
-app.static_folder = 'static'
-app.config['MAIL_SERVER'] = 'smtp.example.com'
-app.config['MAIL_PORT'] = 587  # Puerto para TLS
-app.config['MAIL_USE_TLS'] = True  # Usar TLS
-app.config['MAIL_USERNAME'] = 'karolbayas@gmail.com'
-app.config['MAIL_PASSWORD'] = '123'
-
-mail = Mail(app)
-
-
-#app.config['MYSQL_DATABASE_HOST']='10.22.2.63'
-app.config['MYSQL_DATABASE_HOST']='192.168.1.17'
-app.config['MYSQL_DATABASE_USER']='karolbayas'
-app.config['MYSQL_DATABASE_PASSWORD']='urjc2023'
-app.config['MYSQL_DATABASE_DB']='sitio'
-
+app = Flask(__name__)
+app.config.from_object(Config)  # Configura la aplicación con la configuración de Config
+app.secret_key = '2023K4rol'
+# Inicializa extensiones, como MySQL y Mail
+mysql = MySQL()
 mysql.init_app(app)
 
+mail = Mail(app)
 
 
 @app.route('/')
@@ -227,11 +213,11 @@ def admin_login_post():
             elif session['id_rol'] == 1:
                 return redirect('/admin')
             else:
-                return render_template('admin/login.html', mensaje='Acceso Denegado usuario no creado')
+                return render_template('admin/login.html', mensaje='Access Denied: User not created.')
         else:
-            return render_template('admin/login.html', mensaje='Esperando confirmación')
+            return render_template('admin/login.html', mensaje='Waiting for confirmation.')
     else:
-        return render_template('admin/login.html', mensaje='Acceso Denegado verifica credenciales')
+        return render_template('admin/login.html', mensaje='Access Denied, please verify your credentials.')
 
 
 @app.route('/admin/registro', methods=['GET', 'POST'])
@@ -262,40 +248,53 @@ def admin_registro():
 
     return render_template('admin/registro.html')
 
+
 # Token para restablecer la contraseña
 def generate_reset_token():
     token = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(64))
     return token
 
+# Modifica la función de envío de correo para aceptar argumentos
+def enviar_correo(destinatario, asunto, contenido):
+    msg = Message(asunto, sender='karoltfg2023@gmail.com', recipients=[destinatario])
+    msg.body = contenido
 
+    # Intentar enviar el correo
+    try:
+        mail.send(msg)
+        return True, None  # Correo enviado correctamente
+    except Exception as e:
+        # Manejar cualquier tipo de error que pueda ocurrir al enviarse el correo
+        return False, str(e)  
+
+# olvide_contrasena, llama a enviar_correo 
 @app.route('/admin/olvide-contrasena', methods=['GET', 'POST'])
 def olvide_contrasena():
     if request.method == 'POST':
         email = request.form['email']
-        token = generate_reset_token()  # Generar un token seguro para restablecer la contraseña
+        token = generate_reset_token()  # Genera un token para restablecer la contraseña
 
-        # Guardar el token en la base de datos (puedes usar la misma base de datos o una tabla diferente)
+        # Guardar el token en la base de datos
         conexion = mysql.connect()
         cursor = conexion.cursor()
         cursor.execute("INSERT INTO reset_tokens (email, token) VALUES (%s, %s)", (email, token))
         conexion.commit()
         conexion.close()
 
-        # Crear y enviar el correo electrónico
-        enlace_para_resetear_contrasena = url_for('restablecer_contrasena', token=token, _external=True)
-        msg = Message('Restablecimiento de contraseña', sender='karolbayas@gmail.com', recipients=[email])
-        msg.body = f'Haz clic en el enlace para restablecer tu contraseña: {enlace_para_resetear_contrasena}'
+        # Intentar enviar el correo electrónico
+        exito, error = enviar_correo(email, 'Password Reset ', f'Click on the link to reset your password: {url_for("restablecer_contrasena", token=token, _external=True)}')
 
-    try:
-        mail.send(msg)
-        mensaje = "Se ha enviado un correo con instrucciones para restablecer la contraseña."
-        return render_template('/admin/login.html', mensaje=mensaje)
-    except Exception as e:
-        mensaje = "Ha ocurrido un error al enviar el correo. Por favor, inténtalo más tarde."
-        return render_template('/admin/olvide_contrasena.html', mensaje=mensaje)
+        if exito:
+            mensaje = "An email with instructions to reset your password has been sent."
+            return render_template('admin/login.html', mensaje=mensaje)
+        else:
+            mensaje = f"An error occurred while sending the email. Please try again later. Error: {error}"
+            return render_template('admin/olvide_contrasena.html', mensaje=mensaje)
+
+    return render_template('admin/olvide_contrasena.html')
 
 
-# Ruta para restablecer la contraseña
+# Restablecer la contraseña
 @app.route('/admin/restablecer-contrasena/<token>', methods=['GET', 'POST'])
 def restablecer_contrasena(token):
     if request.method == 'POST':
@@ -308,21 +307,21 @@ def restablecer_contrasena(token):
         resultado = cursor.fetchone()
         
         if resultado:
-            # Actualizar la contraseña en la base de datos (puedes usar la misma tabla de usuarios)
-            cursor.execute("UPDATE usuarios SET password = %s WHERE email = %s", (nueva_contrasena, resultado[0]))
+            # Actualizar la contraseña en la base de datos
+            cursor.execute("UPDATE login SET password = %s WHERE email = %s", (nueva_contrasena, resultado[0]))
             conexion.commit()
             # Eliminar el token de la base de datos después de usarlo
             cursor.execute("DELETE FROM reset_tokens WHERE token = %s", (token,))
             conexion.commit()
             conexion.close()
             
-            mensaje = "Contraseña restablecida con éxito. Ahora puedes iniciar sesión con tu nueva contraseña."
-            return render_template('/admin/login.html', mensaje=mensaje)
+            mensaje = "Password reset successful. You can now log in with your new password."
+            return render_template('admin/login.html', mensaje=mensaje)
         else:
-            mensaje = "El token no es válido. Por favor, solicita otro restablecimiento de contraseña."
-            return render_template('/admin/login.html', mensaje=mensaje)
+            mensaje = "The token is not valid. Please request another password reset."
+            return render_template('admin/login.html', mensaje=mensaje)
 
-    return render_template('/admin/restablecer_contrasena.html', token=token)
+    return render_template('admin/restablecer_contrasena.html', token=token)
 
 
 @app.route('/admin/permisos', methods=['GET', 'POST'])
@@ -415,33 +414,106 @@ def admin_libros_guardar():
     if not 'login' in session:
         return redirect('/admin/login')
 
-    _nombre=request.form['txtNombre']
-    _url=request.form['txtURL']
-    _archivo=request.files['txtImagen']
+    _nombre = request.form['txtNombre']
+    _url = request.form['txtURL']
+    _archivo = request.files['txtImagen']
+    _year = request.form['txtYear']
+    _area_seleccionada = request.form['txtArea']
+    _autor_nombre = request.form['txtAutorNombre']
+    _autor_apellido = request.form['txtAutorApellido']
 
     # Verificar si algún campo está vacío
-    if not _nombre or not _url or not _archivo:
-        mensaje_error = 'Por favor, rellene todos los campos.'
+    if not _nombre or not _url or not _archivo or not _autor_nombre or not _autor_apellido:
+        mensaje_error = 'Please fill in all the fields.'
         return redirect(url_for('admin_libros', mensaje_error=mensaje_error))
 
-    tiempo=datetime.now()
-    horaActual=tiempo.strftime('%Y%H%M%S')
-    if _archivo.filename!="":
-        nuevoNombre=horaActual + "_" + _archivo.filename
-        _archivo.save("templates/sitio/img/"+ nuevoNombre)
+    tiempo = datetime.now()
+    horaActual = tiempo.strftime('%Y%H%M%S')
+    if _archivo.filename != "":
+        nuevoNombre = horaActual + "_" + _archivo.filename
+        _archivo.save("templates/sitio/img/" + nuevoNombre)
 
-    sql="INSERT INTO `libros` (`id`, `nombre`, `imagen`, `url`) VALUES (NULL, %s, %s, %s);" 
-    datos=(_nombre,nuevoNombre,_url)
+    # Verificar si el autor ya existe en la base de datos de autores
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT id FROM autores WHERE nombre = %s AND apellido = %s", (_autor_nombre, _autor_apellido))
+    autor_existente = cursor.fetchone()
+    
+    if autor_existente:
+        _autor_id = autor_existente[0]  # Utilizar el ID del autor existente
+    else:
+        # Si el autor no existe, insertarlo en la base de datos de autores
+        cursor.execute("INSERT INTO autores (nombre, apellido) VALUES (%s, %s)", (_autor_nombre, _autor_apellido))
+        conexion.commit()
+        _autor_id = cursor.lastrowid  # Obtener el ID del nuevo autor
 
-    conexion=mysql.connect()
-    cursor=conexion.cursor()
-    cursor.execute(sql,datos)
+    # Obtener el ID del área seleccionada
+    cursor.execute("SELECT id FROM areas WHERE nombre = %s", (_area_seleccionada,))
+    resultado_area = cursor.fetchone()
+    
+    if resultado_area:
+        _area_id = resultado_area[0]  # Obtener el ID del área
+    else:
+        # Manejar el caso en el que no se encontró la categoría de ÁREA seleccionada
+        conexion.close()
+        return redirect(url_for('admin_libros', mensaje_error='Invalid area selected.'))
+
+    # Continuar con la inserción del libro en la base de datos de libros, incluyendo el _autor_id y _area_id en la consulta SQL.
+    sql = "INSERT INTO `libros` (`id`, `nombre`, `imagen`, `url`, `year`, `area_id`, `autor_id`) VALUES (NULL, %s, %s, %s, %s, %s, %s);"
+    datos = (_nombre, nuevoNombre, _url, _year, _area_id, _autor_id)
+
+    cursor.execute(sql, datos)
     conexion.commit()
+    conexion.close()
 
     print(_nombre)
     print(_url)
     print(_archivo)
     return redirect('/admin/libros')
+
+@app.route('/sitio/libros', methods=['GET'])
+def sitio_libros():
+    year = request.args.get('year')
+    area = request.args.get('area')
+    author = request.args.get('author')
+
+    # Obtener la lista de autores
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT id, nombre, apellido FROM autores")
+    autores = cursor.fetchall()  # Extraer los resultados antes de cerrar la conexión
+
+    # Construir la consulta SQL basada en los parámetros
+    sql = "SELECT * FROM libros WHERE 1=1"
+
+    # Crear la consulta SQL base sin filtrar
+    sql_base = "SELECT * FROM libros"
+    # Agregar condiciones para filtrar por año, área y autor si se seleccionaron
+    conditions = []
+    params = []
+
+    if year:
+        conditions.append("year = %s")
+        params.append(year)
+    if area:
+        conditions.append("area_id = (SELECT id FROM areas WHERE nombre = %s)")
+        params.append(area)
+    if author:
+        # Utiliza el valor de author directamente como author_id
+        author_id = author
+
+        conditions.append("autor_id = %s")
+        params.append(author_id)
+
+    if conditions:
+        sql += " AND " + " AND ".join(conditions)
+
+    cursor.execute(sql, params)
+    libros = cursor.fetchall()
+    conexion.close()
+
+    return render_template('sitio/libros.html', libros=libros, autores=autores)
+
 
 @app.route('/admin/libros/borrar', methods=['POST'])
 def admin_libros_borrar():

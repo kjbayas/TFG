@@ -19,7 +19,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-                <h2 class="text-center">Event List</h2>
+                <h1 class="text-center">Event List</h1>
                 <div class="list-group" id="eventList"></div>
             </div>
             <div class="col-md-6">
@@ -34,8 +34,8 @@
             {
                 title: '{{ event[1] }}',
                 place:  '{{ event[2] }}',
-                start: '{{ event[3].strftime("%Y-%m-%d") }}',
-                end: '{{ event[4].strftime("%Y-%m-%d") }}'
+                start: '{{ event[3].strftime("%Y-%m-%dT%H:%M:%S") }}',
+                end: '{{ event[4].strftime("%Y-%m-%dT%H:%M:%S") }}'
             },
             {% endfor %}
         ];
@@ -53,7 +53,7 @@
         // Filtrar eventos futuros y eventos de hoy
         var today = moment().startOf('day');
         var futureAndTodayEvents = events.filter(function(event) {
-            var eventStartDate = moment(event.start, "YYYY-MM-DD");
+            var eventStartDate = moment(event.start, "YYYY-MM-DDTHH:mm:ss");
             return eventStartDate.isSameOrAfter(today);
         });
 
@@ -66,50 +66,52 @@
                 <a href="#" class="list-group-item list-group-item-action active">
                     <div class="row">
                         <div class="col-md-4"><strong>Title</strong></div>
-                        <div class="col-md-4"><strong>Date and Time</strong></div>
-                        <div class="col-md-4"><strong>Place</strong></div>
+                        <div class="col-md-2"><strong>Start Date</strong></div>
+                        <div class="col-md-2"><strong>End Date</strong></div>
+                        <div class="col-md-2"><strong>Place</strong></div>
                     </div>
                 </a>`;
             eventList.append(listHeader);
 
             futureAndTodayEvents.sort(function(a, b) {
-                var dateA = moment(a.start, "YYYY-MM-DD").toDate();
-                var dateB = moment(b.start, "YYYY-MM-DD").toDate();
+                var dateA = moment(a.start, "YYYY-MM-DDTHH:mm:ss").toDate();
+                var dateB = moment(b.start, "YYYY-MM-DDTHH:mm:ss").toDate();
                 return dateA - dateB;
             });
 
             $.each(futureAndTodayEvents, function(index, event) {
-                var startFormatted = moment(event.start).format("DD/MM/YYYY HH:mm"); // Agregar la hora
+                var startFormatted = moment(event.start).format("DD/MM/YYYY HH:mm:ss");
+                var endFormatted = moment(event.end).format("DD/MM/YYYY HH:mm:ss"); 
                 var listItem = `
-                    <a href="#" class="list-group-item list-group-item-action ${event.isToday ? 'list-group-item-danger' : ''}">
+                    <a href="#" class="list-group-item list-group-item-action ${event.isToday ? 'list-group-item-success' : ''}">
                         <div class="row">
                             <div class="col-md-4">${event.title}</div>
-                            <div class="col-md-3">${startFormatted}</div>
-                            <div class="col-md-3">${event.place}</div>
+                            <div class="col-md-2">${startFormatted}</div>
+                            <div class="col-md-2">${endFormatted}</div> 
+                            <div class="col-md-2">${event.place}</div>
                         </div>
                     </a>`;
                 eventList.append(listItem);
             });
-
         }
 
-        // Resaltar evento del día
-        function highlightTodayEvent() {
-            var todayEvent = futureAndTodayEvents.find(function(event) {
-                var eventStartDate = moment(event.start, "YYYY-MM-DD").startOf('day');
-                return eventStartDate.isSame(today);
+        // Resalta eventos del día
+        function highlightTodayEvents() {
+            futureAndTodayEvents.forEach(function(event) {
+                var eventStartDate = moment(event.start, "YYYY-MM-DDTHH:mm:ss").startOf('day');
+                if (eventStartDate.isSame(today)) {
+                    event.isToday = true;
+                } else {
+                    event.isToday = false;
+                }
             });
-
-            if (todayEvent) {
-                todayEvent.isToday = true;
-            }
         }
 
-        // Cargar los eventos en la lista y resaltar el evento del día cuando el DOM esté listo
+        // Cargar los eventos en la lista y resaltar los eventos del día cuando el DOM esté listo
         $(document).ready(function() {
             loadEventList();
-            highlightTodayEvent();
-            loadEventList(); // Llamar a loadEventList nuevamente después de resaltar el evento del día
+            highlightTodayEvents();
+            loadEventList(); // Llamar a loadEventList nuevamente después de resaltar los eventos del día
         });
 
     </script>

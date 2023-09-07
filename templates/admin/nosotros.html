@@ -27,7 +27,7 @@
     <br/>
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <h2>Create Event</h2>
                 <form id="eventForm">
                     <div class="mb-3">
@@ -49,7 +49,7 @@
                     <button type="submit" class="btn btn-primary">Create Event</button>
                 </form>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-7">
                 <div id="calendar"></div>
             </div>
         </div>
@@ -65,7 +65,7 @@
     </div>
 
     <script>
-        // Obtener la variable "tiene_permiso" de tu backend para determinar si el usuario tiene permiso de edición
+        // Obtener la variable "tiene_permiso" de backend para determinar si el usuario tiene permiso de edición
         var editable = {{ tiene_permiso|lower }};
         
         // Obtener los eventos del calendario desde tu backend
@@ -97,7 +97,7 @@
                     title: title,
                     start: start,
                     end: end,
-                    place: place // Incluir el campo "place" en los datos enviados
+                    place: place 
                 },
                 success: function(data) {
                     alert(data);
@@ -175,7 +175,7 @@
                     var start = $.fullCalendar.formatDate(event.start, "Y-MM-DD HH:mm:ss");
                     var end = $.fullCalendar.formatDate(event.end, "Y-MM-DD HH:mm:ss");
                     var title = event.title;
-                    var place = event.place; // Agregado: Capturar el valor de "place"
+                    var place = event.place;
                     var id = event.id;
                     $.ajax({
                         url: "{{ url_for('update') }}",
@@ -204,8 +204,8 @@
             <a href="#" class="list-group-item list-group-item-action active text-center">
                 <div class="row">
                     <div class="col-md-4"><strong>Title</strong></div>
-                    <div class="col-md-2"><strong>Date-Start</strong></div>
-                    <div class="col-md-2"><strong>Date-End</strong></div>
+                    <div class="col-md-2"><strong>Start Date</strong></div>
+                    <div class="col-md-2"><strong>End Date</strong></div>
                     <div class="col-md-2"><strong>Place</strong></div>
                     <div class="col-md-2"><strong>Action</strong></div>
                 </div>
@@ -218,7 +218,6 @@
                 var dateB = moment(b.start).toDate();
                 return dateA - dateB;
             });
-
 
             // Filtrar eventos para mostrar solo los del día de hoy y futuros
             var today = moment().startOf('day');

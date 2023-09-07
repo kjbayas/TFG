@@ -4,41 +4,63 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md">
             <div class="card">
                 <div class="card-header">
-                    Datos del libro
+                    <h1 class="text-center">INSCRIPCIÓN</h1>
+                    <p>
+                        <strong>Attention:</strong> Before uploading the information, we kindly request that you be careful and attentive 
+                        to the provided data and that the recommended specifications are met.
+                    </p>
                 </div>
                 <div class="card-body">
                    <form action="/admin/libros/guardar" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
-                          <label for="" class="form-label">Name:</label>
+                          <label for="" class="form-label">Title:</label>
                           <input type="text"
-                            class="form-control" name="txtNombre" id="txtNombre" aria-describedby="helpId" placeholder="Escriba el nombre del libro">
+                            class="form-control" name="txtNombre" id="txtNombre" aria-describedby="helpId" placeholder="Write the file's title">
                         </div>
                         <div class="mb-3">
-                            <label for="" class="form-label">Autor:</label>
-                            <input type="text"
-                              class="form-control" name="txtNombre" id="txtNombre" aria-describedby="helpId" placeholder="Escriba el nombre del libro">
-                        </div>
-                        <div class="mb-3">
-                            <label for="" class="form-label">Clasificacion:</label>
-                            <input type="text"
-                              class="form-control" name="txtNombre" id="txtNombre" aria-describedby="helpId" placeholder="Escriba el nombre del libro">
-                        </div>
-                        <div class="mb-3">
-                          <label for="" class="form-label">Imagen:</label>
+                          <label for="" class="form-label">Cover image:</label>
                           <input type="file"
-                            class="form-control" name="txtImagen" id="txtImagen" aria-describedby="helpId" placeholder="Seleccione la Imagen">
+                            class="form-control" name="txtImagen" id="txtImagen" aria-describedby="helpId" placeholder="Select the main image">
                         </div>
-
+                        <div class="mb-3">
+                            <label for="txtAutorNombrer">Author Name:</label>
+                            <input type="text" class="form-control" name="txtAutorNombre" id="txtAutorNombre" placeholder="Author's First Name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="txtAutorApellido">Author Last Name:</label>
+                            <input type="text" class="form-control" name="txtAutorApellido" id="txtAutorApellido" placeholder="Author's Last Name">
+                        </div>                     
                         <div class="mb-3">
                             <label for="" class="form-label">URL descarga:</label>
                             <input type="text"
                               class="form-control" name="txtURL" id="txtURL" aria-describedby="helpId" placeholder="Escriba la URL de descarga">
                         </div>
+                        <div class="mb-3">
+                            <label for="txtYear">Year:</label>
+                            <select id="txtYear" name="txtYear">
+                                <option value="">Select a year.</option>
+                                {% for year in range(1800, 2051) %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-                        <button type="submit" class="btn btn-primary">Agregar</button>
+                        <div class="mb-3">
+                            <label for="txtArea">Area:</label>
+                            <select id="txtArea" name="txtArea" class="form-select">
+                                <option value="">Select an area.</option>
+                                <option value="CONSTRUCCIÓN">CONSTRUCCIÓN</option>
+                                <option value="EXPRESIÓN GRÁFICA">EXPRESIÓN GRÁFICA</option>
+                                <option value="URBANISMO">URBANISMO</option>
+                                <option value="PROYECTOS">PROYECTOS</option>
+                                <option value="ESTRUCTURAS">ESTRUCTURAS</option>
+                                <option value="INSTALACIONES">INSTALACIONES</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add</button>
                    </form>
 
                 </div>
@@ -50,48 +72,42 @@
             </div>
         </div>
 
-<!--Colocacion de los libros -->
-        <div class="col-md-7">
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <!--<th scope="col">ID</th>-->
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Imagen</th>
-                            <th scope="col">URL</th>
-                            <th scope="col">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {%for libro in libros %}
-                        <tr class="">
-                            <!--<th scope="col">ID</th>-->
-                            <td>{{libro[1]}}</td>
-                            <td>
-                                <img width="120" src="/img/{{libro[2]}}" class="img-fluid rounded-top img-grayscale" alt="">
-                            </td>                            
-                            <td>
-                                
-                                <a name="" id="" class="btn btn-light" href="{{libro[3]}}" role="button">{{libro[1]}}</a>
-                                
-                            </td>
-                            <td>
-                                <form action="/admin/libros/borrar" method="post">
-                                    <input value="{{libro[0]}}" type="hidden" name="txtID" id="txtID">
-                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                </form>
-                                
-                            </td>
-                        </tr>
-                        {% endfor %}
-
-                    </tbody>
-                </table>
-
-            </div>
+        <!--Colocacion de los libros -->
+            
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <!--<th scope="col">ID</th>-->
+                        <th scope="col">Title</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">URL</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for libro in libros %}
+                    <tr class="">
+                        <!--<th scope="col">ID</th>-->
+                        <td>{{libro[1]}}</td>
+                        <td>
+                            <img width="120" src="/img/{{libro[2]}}" class="img-fluid rounded-top img-grayscale" alt="">
+                        </td>                            
+                        <td>
+                            <a name="" id="" class="btn btn-light" href="{{libro[3]}}" role="button">{{libro[1]}}</a>
+                        </td>
+                        <td>
+                            <form action="/admin/libros/borrar" method="post">
+                                <input value="{{libro[0]}}" type="hidden" name="txtID" id="txtID">
+                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                            </form>
+                            
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        
     </div>
 </div>
 

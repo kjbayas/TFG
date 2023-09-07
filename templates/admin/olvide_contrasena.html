@@ -4,30 +4,31 @@
     <html lang="en">
     
     <head>
-      <title>Login del administrador</title>
-      <!-- Required meta tags -->
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Restablecer Contraseña</title>
+        <!-- Agrega tus enlaces a archivos CSS si los necesitas -->
     </head>
-<body>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6 offset-md-3">
-                <h2>Restablecer Contraseña</h2>
-                {% if mensaje %}
-                <div class="alert alert-success">{{ mensaje }}</div>
-                {% endif %}
-                <form method="post">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Correo Electrónico</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Enviar Correo</button>
-                </form>
+    
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <h2>Restablecer Contraseña</h2>
+                    {% if mensaje %}
+                    <div class="alert alert-success">{{ mensaje }}</div>
+                    {% endif %}
+                    <form method="POST" action="/admin/olvide-contrasena">
+                        <!-- Otros campos del formulario -->
+                        <input type="email" name="email" placeholder="Correo electrónico" required>
+                        <!-- Otros campos del formulario -->
+                        <button type="submit">Enviar</button>
+                    </form>
+                    
+                </div>
             </div>
         </div>
-    </div>
-
-</body>
-</html>
+    </body>
+    
+    </html>
+    
