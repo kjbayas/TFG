@@ -11,7 +11,10 @@
   <link href="/css/bootstrap.css" rel="stylesheet" crossorigin="anonymous" > 
   <style>
     body {
-        margin: 20px; /* Establece el margen deseado */
+      margin: 20px; /* Establece el margen deseado */
+    }
+    .bold-text {
+      font-weight: bold;
     }
   </style>
 </head>
@@ -25,10 +28,11 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-        <div class="navbar-nav">
+        <ul class="navbar-nav">
           <a class="nav-item nav-link" title="Home" href="/">Home</a>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle" href="/" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <!-- ========== esto hay que editar porque el desplegable de page cuando estamos en detalle_libro no funciona de momento te lleva a la home ========== -->
               Pages
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -37,8 +41,12 @@
             </ul>
           </li>
           <a class="nav-item nav-link" alt="Cslendar" href="/nosotros">Calendar</a>
-          <a class="nav-item nav-link" href="/admin/login">Login</a>
-        </div>
+          {% if 'username' in session %}
+            <a class="nav-item nav-link" href="/admin">Profile</a>
+          {% else %}
+            <a class="nav-item nav-link" href="/admin/login">Login</a>
+          {% endif %}
+        </ul>
 
       </div>
     </div>

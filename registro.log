@@ -1,0 +1,16 @@
+2023-09-20T11:52:30.567578800: ---- Inicio de insercion ----
+2023-09-20T11:52:30.587159: ---- Error al insertar usuario ----
+2023-09-20T11:52:30.587159: No suitable driver found for jdbc:oracle:thin:nuevocms_pro/aA95t3sdeSOPbken3@inter0rac.antena3tv.es:1522/webges
+2023-09-20T11:52:30.587159: ---- Cierre de insercion ----
+2023-09-20T11:58:22.890071200: ---- Inicio de insercion ----
+2023-09-20T11:58:22.910106400: ---- Error al insertar usuario ----
+2023-09-20T11:58:22.910106400: No suitable driver found for jdbc:oracle:thin:nuevocms_pro/aA95t3sdeSOPbken3@inter0rac.antena3tv.es:1522/webges
+2023-09-20T11:58:22.910106400: ---- Cierre de insercion ----
+2023-09-20T11:58:44.760052700: ---- Inicio de insercion ----
+2023-09-20T11:58:44.760052700: ---- Error al insertar usuario ----
+2023-09-20T11:58:44.760052700: No suitable driver found for jdbc:oracle:thin:nuevocms_pro/aA95t3sdeSOPbken3@inter0rac.antena3tv.es:1522/webges
+2023-09-20T11:58:44.760052700: ---- Cierre de insercion ----
+2023-09-20T11:59:16.699929100: ---- Inicio de insercion en Pro ----
+2023-09-20T11:59:16.719663300: ---- Error al insertar usuario en Pro ----
+2023-09-20T11:59:16.720159100: No suitable driver found for jdbc:oracle:thin:nuevocms_pro/aA95t3sdeSOPbken3@inter0rac.antena3tv.es:1522/webges
+2023-09-20T11:59:16.720159100: ---- Cierre de insercion en Pro ----

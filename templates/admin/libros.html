@@ -1,8 +1,7 @@
 {% include 'admin/cabecera.html' %}
 
 </br>
-
-<div class="container">
+<div class="container mt-4">
     <div class="row">
         <div class="col-md">
             <div class="card">
@@ -70,48 +69,10 @@
                     {% endif %}  
                 </div>
             </div>
-        </div>
-
-        <!--Colocacion de los libros -->
-            
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <!--<th scope="col">ID</th>-->
-                        <th scope="col">Title</th>
-                        <th scope="col">Image</th>
-                        <th scope="col">URL</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {%for libro in libros %}
-                    <tr class="">
-                        <!--<th scope="col">ID</th>-->
-                        <td>{{libro[1]}}</td>
-                        <td>
-                            <img width="120" src="/img/{{libro[2]}}" class="img-fluid rounded-top img-grayscale" alt="">
-                        </td>                            
-                        <td>
-                            <a name="" id="" class="btn btn-light" href="{{libro[3]}}" role="button">{{libro[1]}}</a>
-                        </td>
-                        <td>
-                            <form action="/admin/libros/borrar" method="post">
-                                <input value="{{libro[0]}}" type="hidden" name="txtID" id="txtID">
-                                <button type="submit" class="btn btn-danger">Eliminar</button>
-                            </form>
-                            
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        </div>        
     </div>
 </div>
-
-
-
-
+</br>
+{% include 'admin/tablalibros.html' %}
+        
 {% include 'admin/pie.html' %}

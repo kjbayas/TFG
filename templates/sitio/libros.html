@@ -60,7 +60,9 @@
     {% for libro in libros %}
     <div class="col-md-2 card-column">
         <div class="card text-center">
-            <img class="card-img-top mx-auto img-grayscale" src="/img/{{libro[2]}}" alt="Title">
+            <a href="/sitio/admin/libros/{{ libro[0] }}"> <!-- Modifica esta línea -->
+                <img class="card-img-top mx-auto img-grayscale" src="/img/{{ libro[2] }}" alt="Title">
+            </a>
             <div class="card-body">
                 <p class="card-text">
                     <a name="" id="" class="btn btn-outline-dark" href="{{libro[3]}}" role="button">{{libro[1]}}</a>

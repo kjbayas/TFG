@@ -36,7 +36,9 @@
             <a class="nav-item nav-link active" href="/admin/" aria-current="page">Home</a>
             <a class="nav-item nav-link" href="libros">Books</a>
             <a class="nav-item nav-link" href="nosotros">Calendar</a>
-            <a class="nav-item nav-link" href="cerrar">Close</a>
+            {% if 'username' in session %}
+                <a class="nav-item nav-link" href="cerrar">Close</a>
+            {% endif %}
             <a class="nav-item nav-link" href="/">Website </a>
             {% if 'username' in session and session['username'] == 'karolbayas' %}
                 <a class="nav-item nav-link" href="permisos">Permisos</a>

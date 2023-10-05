@@ -6,38 +6,30 @@ import logging
 from logging.handlers import RotatingFileHandler
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, session, url_for, send_from_directory, jsonify
+from flask_babel import Babel
 from flaskext.mysql import MySQL
 from flask_mail import Mail, Message
 from config import Config 
+from flask_login import login_required
+
+
+
 
 app = Flask(__name__)
 app.config.from_object(Config)  # Configura la aplicación con la configuración de Config
 app.secret_key = '2023K4rol'
-# Inicializa extensiones, como MySQL y Mail
+
+# Inicializa extensiones, MySQL, Mail
 mysql = MySQL()
 mysql.init_app(app)
-
 mail = Mail(app)
+babel = Babel(app)
+
 
 
 @app.route('/')
 def inicio():
-    conexion = mysql.connect()
-    cursor = conexion.cursor()
-
-    cursor.execute("SELECT * FROM nodos")
-    nodos = cursor.fetchall()
-
-    cursor.execute("SELECT * FROM enlaces")
-    enlaces = cursor.fetchall()
-    nodos_json = json.dumps(nodos)
-    enlaces_json = json.dumps(enlaces)
-    # Imprime los valores de nodos y enlaces en la consola del servidor Flask
-    print(nodos_json)
-    print(enlaces_json)
-
-    conexion.close()
-    return render_template('sitio/index.html' , nodos=nodos_json, enlaces=enlaces_json)
+    return render_template('sitio/index.html')
 
 # Añadimos estilos de forma general 
 @app.route('/css/<archivocss>') 
@@ -50,17 +42,14 @@ def imagenes(imagen):
     print(imagen)
     return send_from_directory(os.path.join('templates/sitio/img'),imagen)
 
-# llamada a la web de books 
+# llamada a la web de libros 
 @app.route('/libros')
 def libros():
-
-    conexion=mysql.connect()  # Establecemos una conexion a la Base de datos
+    conexion=mysql.connect()  
     cursor= conexion.cursor()
     cursor.execute("SELECT * FROM `libros`")
     libros=cursor.fetchall()
     conexion.commit()
-    print(libros)
-
     return render_template('sitio/libros.html', libros=libros)
 
 
@@ -171,20 +160,43 @@ def admin_login_cerrar():
 
 @app.route('/admin/libros')
 def admin_libros():
-
     if not 'login' in session:
         return redirect('/admin/login')
 
-    conexion=mysql.connect()  
-    cursor= conexion.cursor()
-    cursor.execute("SELECT * FROM `libros`")
-    libros=cursor.fetchall()
-    conexion.commit()
-    print(libros)
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
 
-    mensaje_error = request.args.get('mensaje_error')
+    # Obtener los datos de los libros
+    cursor.execute("SELECT * FROM `libros`")
+    libros = cursor.fetchall()
+
+    # Obtener los datos de los autores
+    cursor.execute("SELECT id, nombre, apellido FROM autores")
+    autores_data = cursor.fetchall()
+
+    # Comprobar la relación entre libros y autores
+    for libro in libros:
+        libro_id = libro[0]
+        autor_id_libro = libro[6]
+        autor_encontrado = False
+        
+        # Iterar sobre las tuplas de autores_data para buscar el autor
+        for autor_data in autores_data:
+            autor_id_data = autor_data[0]
+            if autor_id_libro == autor_id_data:
+                autor_encontrado = True
+                break
+        
+        # Verificar si se encontró el autor para el libro actual
+        if not autor_encontrado:
+            mensaje_error = f"No se encontró el autor para el libro ID: {libro_id}"
+            return render_template('admin/libros.html', libros=libros, autores=autores_data, mensaje_error=mensaje_error)
+
+    conexion.close()
     
-    return render_template('admin/libros.html', libros=libros,mensaje_error=mensaje_error)
+    # Si todos los autores están correctamente relacionados, renderizar la plantilla
+    return render_template('admin/libros.html', libros=libros, autores=autores_data)
+
 
 
 @app.route('/admin/login')
@@ -207,6 +219,7 @@ def admin_login_post():
             session['login'] = True
             session['username'] = login[1]
             session['id_rol'] = login[4]
+            session['id'] = login[0]
 
             if session['id_rol'] == 0:
                 return redirect('/admin')
@@ -414,13 +427,13 @@ def admin_libros_guardar():
     if not 'login' in session:
         return redirect('/admin/login')
 
-    _nombre = request.form['txtNombre']
+    _nombre = request.form['txtNombre'].upper()
     _url = request.form['txtURL']
     _archivo = request.files['txtImagen']
     _year = request.form['txtYear']
     _area_seleccionada = request.form['txtArea']
-    _autor_nombre = request.form['txtAutorNombre']
-    _autor_apellido = request.form['txtAutorApellido']
+    _autor_nombre = request.form['txtAutorNombre'].upper()
+    _autor_apellido = request.form['txtAutorApellido'].upper()
 
     # Verificar si algún campo está vacío
     if not _nombre or not _url or not _archivo or not _autor_nombre or not _autor_apellido:
@@ -482,14 +495,9 @@ def sitio_libros():
     cursor = conexion.cursor()
     cursor.execute("SELECT id, nombre, apellido FROM autores")
     autores = cursor.fetchall()  # Extraer los resultados antes de cerrar la conexión
-
-    # Construir la consulta SQL basada en los parámetros
-    sql = "SELECT * FROM libros WHERE 1=1"
-
-    # Crear la consulta SQL base sin filtrar
+    sql = "SELECT * FROM libros WHERE 1=1"     # Construye la consulta SQL que se basa en los parámetros
     sql_base = "SELECT * FROM libros"
-    # Agregar condiciones para filtrar por año, área y autor si se seleccionaron
-    conditions = []
+    conditions = [] # crea condiciones de filtrado
     params = []
 
     if year:
@@ -499,9 +507,7 @@ def sitio_libros():
         conditions.append("area_id = (SELECT id FROM areas WHERE nombre = %s)")
         params.append(area)
     if author:
-        # Utiliza el valor de author directamente como author_id
         author_id = author
-
         conditions.append("autor_id = %s")
         params.append(author_id)
 
@@ -529,7 +535,8 @@ def admin_libros_borrar():
     libro=cursor.fetchall()
     conexion.commit()
     print(libro)
-
+    cursor.execute("DELETE FROM comentarios WHERE libro_id = %s", (_id,))
+    conexion.commit()
     conexion=mysql.connect()
     cursor= conexion.cursor()
     cursor.execute("DELETE FROM libros WHERE id =%s",(_id))
@@ -537,11 +544,60 @@ def admin_libros_borrar():
     
     return redirect('/admin/libros')
 
+@app.route('/sitio/admin/libros/<int:libro_id>', methods=['GET'])
+@app.route('/admin/libros/<int:libro_id>', methods=['GET'])
+@app.route('/sitio/admin/libros.html/<int:libro_id>', methods=['GET', 'POST'])
+def ver_libro(libro_id):
+    conexion=mysql.connect()
+    cursor= conexion.cursor()
+    cursor.execute("SELECT * FROM libros WHERE id = %s", (libro_id,))
+    libro = cursor.fetchone()
+    cursor.execute("SELECT id, nombre, apellido FROM autores WHERE id = %s", (libro[6],))
+    autores_data = cursor.fetchall()
+    cursor.execute("SELECT comentarios.id, comentarios.comentario, login.username, comentarios.user_id FROM comentarios INNER JOIN login ON comentarios.user_id = login.id WHERE comentarios.libro_id = %s", (libro_id,))
+    comentarios = cursor.fetchall()
+    cursor.close()
+    if not libro:
+        return render_template('error.html', error_message='Libro no encontrado')
+    return render_template('detalle_libro.html', libro=libro, autores=autores_data, comentarios=comentarios)
+
+
+@app.route('/admin/libros/<int:libro_id>/comentarios', methods=['POST'])
+def agregar_comentario(libro_id):
+    print("Recibida solicitud POST para agregar comentario.")
+    comentario = request.form['comentario']
+    user_id = session.get('id')  
+    print("Comentario:", comentario)
+    print("User ID:", user_id)
+    # Verificar si user_id es None (no hay usuario en la sesión)
+    if user_id is None:
+        # Redirigir al usuario a la página de inicio de sesión o mostrar un mensaje de error
+        return render_template('error.html', error_message='Debes iniciar sesión para comentar')
+    
+    conexion=mysql.connect()
+    cursor= conexion.cursor()
+    cursor.execute("INSERT INTO comentarios (libro_id, comentario, user_id) VALUES (%s, %s, %s)", (libro_id, comentario, user_id))
+    conexion.commit()
+    conexion.close()    
+    return redirect('/admin/libros/' + str(libro_id))
+    return redirect(request.referrer)
+
+@app.route('/admin/libros/comentarios/<int:comentario_id>/eliminar', methods=['POST', 'DELETE'])
+def eliminar_comentario(comentario_id):
+    if request.method in ['POST', 'DELETE']:
+        try:
+            conexion = mysql.connect()
+            cursor = conexion.cursor()
+            cursor.execute("DELETE FROM comentarios WHERE id = %s", (comentario_id,))
+            conexion.commit()
+            return redirect(request.referrer)
+        except Exception as e:
+            print("Error al eliminar comentario:", e)
+            return render_template('error.html', error_message='Error al eliminar comentario')
+
 @app.route('/favicon.ico')
 def favicon():
     return '', 204
-
-
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 if not app.debug:

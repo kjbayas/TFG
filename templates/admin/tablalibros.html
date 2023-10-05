@@ -1,0 +1,49 @@
+<link rel="stylesheet" href="/static/stylesbook.css">
+
+<div class="col-md-10 mx-auto text-center">
+    <div class="table-responsive ">
+        <table class="table table-bordered w-100">
+            <thead class="text-center " > 
+                <tr>
+                    <th scope="col" class="font-weight-bold fs-4">Acciones</th>
+                    <th scope="col" class="font-weight-bold fs-4">Image</th>
+                    <th scope="col" class="font-weight-bold fs-4">Title</th>
+                    <th scope="col" class="font-weight-bold fs-4">URL</th>
+                    <th scope="col" class="font-weight-bold fs-4">Author</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                {% for libro in libros %}
+                <tr >
+                    <!--<th scope="col">ID</th>-->
+                    <td class=" d-flex align-items-center">
+                        <form action="/admin/libros/borrar" method="post">
+                            <input value="{{libro[0]}}" type="hidden" name="txtID" id="txtID">
+                            <button type="submit" class="btn btn-outline-dark delete-btn me-4">Delete</button>
+                        </form>
+                        <a href="/admin/libros/{{ libro[0] }}" class="btn btn-outline-dark info-btn">Books</a>
+                    </td>
+                    <td>
+                        <img width="50" height="50" src="/img/{{libro[2]}}" class="img-fluid rounded-top img-grayscale" alt="">
+                    </td>
+                    <td>{{libro[1]}}</td>                         
+                    <td>
+                        <a name="" id="" class="btn btn-light" href="{{libro[3]}}" role="button">{{libro[1]}}</a>
+                    </td>
+
+                    <td>
+                        {% set autor_encontrado = false %}
+                        {% for autor in autores %}
+                            {% if libro[6] == autor[0] %}
+                                {{ autor[1] }} {{ autor[2] }}  <br>
+                                {% set autor_encontrado = true %}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

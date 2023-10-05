@@ -1,0 +1,19 @@
+/* styles.css */
+.table tbody tr {
+    height: 25px;
+}
+
+.table td,
+.table th {
+    width: 20%;
+}
+
+.btn-outline-dark.delete-btn:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-outline-dark.info-btn:hover {
+    background-color: #19698c;
+    color: white;
+}
