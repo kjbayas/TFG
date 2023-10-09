@@ -15,40 +15,56 @@
                 <div class="card-body">
                    <form action="/admin/libros/guardar" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
-                          <label for="" class="form-label">Title:</label>
+                          <label for="" class="form-label">*Title:</label>
                           <input type="text"
                             class="form-control" name="txtNombre" id="txtNombre" aria-describedby="helpId" placeholder="Write the file's title">
                         </div>
                         <div class="mb-3">
-                          <label for="" class="form-label">Cover image:</label>
+                          <label for="" class="form-label">*Cover Image:</label>
                           <input type="file"
                             class="form-control" name="txtImagen" id="txtImagen" aria-describedby="helpId" placeholder="Select the main image">
                         </div>
                         <div class="mb-3">
-                            <label for="txtAutorNombrer">Author Name:</label>
+                            <label for="txtAutorNombrer">*Author Name:</label>
                             <input type="text" class="form-control" name="txtAutorNombre" id="txtAutorNombre" placeholder="Author's First Name">
                         </div>
                         <div class="mb-3">
-                            <label for="txtAutorApellido">Author Last Name:</label>
+                            <label for="txtAutorApellido">*Author Last Name:</label>
                             <input type="text" class="form-control" name="txtAutorApellido" id="txtAutorApellido" placeholder="Author's Last Name">
                         </div>                     
                         <div class="mb-3">
-                            <label for="" class="form-label">URL descarga:</label>
+                            <label for="" class="form-label">*URL descarga:</label>
                             <input type="text"
-                              class="form-control" name="txtURL" id="txtURL" aria-describedby="helpId" placeholder="Escriba la URL de descarga">
+                              class="form-control" name="txtURL" id="txtURL" aria-describedby="helpId" placeholder="download url">
                         </div>
                         <div class="mb-3">
-                            <label for="txtYear">Year:</label>
+                            <label for="txtDescripcion" class="form-label">Description:</label>
+                            <textarea class="form-control" name="txtDescripcion" id="txtDescripcion" placeholder="Describes the document"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="txtVideo" class="form-label">Video:</label>
+                            <input type="file" class="form-control" name="txtVideo" id="txtVideo" placeholder="supports only mp4">
+                        </div>
+                        <div class="mb-3">
+                            <label for="txtPDF" class="form-label">PDF:</label>
+                            <input type="file" class="form-control" name="txtPDF" id="txtPDF" placeholder="pdf file">
+                        </div>
+                        <div class="mb-3">
+                            <label for="txtImagenSecundaria" class="form-label">Image:</label>
+                            <input type="file" class="form-control" name="txtImagenSecundaria" id="txtImagenSecundaria" placeholder="Do you want to add more images?">
+                        </div>
+                        <div class="mb-3">
+                            <label for="txtYear">*Year:</label>
                             <select id="txtYear" name="txtYear">
                                 <option value="">Select a year.</option>
-                                {% for year in range(1800, 2051) %}
+                                {% for year in range(2030, 1849, -1) %}
                                     <option value="{{ year }}">{{ year }}</option>
                                 {% endfor %}
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label for="txtArea">Area:</label>
+                            <label for="txtArea">*Area:</label>
                             <select id="txtArea" name="txtArea" class="form-select">
                                 <option value="">Select an area.</option>
                                 <option value="CONSTRUCCIÓN">CONSTRUCCIÓN</option>

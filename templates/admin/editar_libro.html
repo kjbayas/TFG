@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Title</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS v5.2.1 -->
+  <link href="/css/bootstrap.css" rel="stylesheet" crossorigin="anonymous" > 
+  <style>
+    /* Estilos para el logotipo */
+    body {
+        margin: 20px; 
+    }
+    .navbar {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+  </style>
+
+</head>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center">Edit Book</h1>
+    <form action="/admin/libros/{{ libro[0] }}/guardar" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="txtNombre" class="form-label">Title:</label>
+            <input type="text" class="form-control" name="txtNombre" id="txtNombre" value="{{ libro[1] }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="txtImagen" class="form-label">Cover Image</label>
+            <input type="file" class="form-control" name="txtImagen" value="{{ libro[2] }} id="txtImagen">
+        </div>
+        <div class="mb-3">
+            <label for="txtURL" class="form-label">Download URL:</label>
+            <input type="text" class="form-control" name="txtURL" id="txtURL" value="{{ libro[3] }}"placeholder="URL de descarga" required>
+        </div>
+        <div class="mb-3">
+            <label for="txtYear">*Year:</label>
+            <select id="txtYear" name="txtYear">
+                <option value="{{ libro[4] }}">Select a year.</option>
+                {% for year in range(2030, 1849, -1) %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="txtArea">*Area:</label>
+                            <select id="txtArea" name="txtArea" class="form-select">
+                                <option value="">Select an area:</option>
+                                <option value="CONSTRUCCIÓN">CONSTRUCCIÓN</option>
+                                <option value="EXPRESIÓN GRÁFICA">EXPRESIÓN GRÁFICA</option>
+                                <option value="URBANISMO">URBANISMO</option>
+                                <option value="PROYECTOS">PROYECTOS</option>
+                                <option value="ESTRUCTURAS">ESTRUCTURAS</option>
+                                <option value="INSTALACIONES">INSTALACIONES</option>
+                            </select>
+        </div>
+        <div class="mb-3">
+            <label for="txtAutorNombre" class="form-label">Author Name:</label>
+            <input type="text" class="form-control" name="txtAutorNombre" id="txtAutorNombre" placeholder="Nombre del autor" required>
+        </div>
+        <div class="mb-3">
+            <label for="txtAutorApellido" class="form-label">Author Last Name:</label>
+            <input type="text" class="form-control" name="txtAutorApellido" id="txtAutorApellido" placeholder="Apellido del autor" required>
+        </div>
+        <div class="mb-3">
+            <label for="txtDescripcion" class="form-label">Description:</label>
+            <textarea class="form-control" name="txtDescripcion" id="txtDescripcion" placeholder="Descripción del libro"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="txtVideo" class="form-label">Video:</label>
+            <input type="file" class="form-control" name="txtVideo" id="txtVideo">
+        </div>
+        <div class="mb-3">
+            <label for="txtPDF" class="form-label">PDF:</label>
+            <input type="file" class="form-control" name="txtPDF" id="txtPDF">
+        </div>
+        <div class="mb-3">
+            <label for="txtImagenSecundaria" class="form-label">Image:</label>
+            <input type="file" class="form-control" name="txtImagenSecundaria" id="txtImagenSecundaria">
+        </div>
+        <div class="mb-3 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="/admin/libros" class="btn btn-danger">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

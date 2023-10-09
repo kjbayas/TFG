@@ -7,25 +7,75 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='estilos.css') }}">
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.js"></script>
+  <style>
+    body {
+        background-image: url('/static/archivos/fondos/fondo5.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+  </style>
 
 
 </head>
 <body>
+
+  <div class="row justify-content-center">
+      <div class="col-md-12 ">
+          <div class="p-5 mb-4 rounded-3 " style="background-color: rgba(255, 255, 255, 0.8);">
+              <div class="row">
+                  <div class="col-md-4 bg-transparent text-center">
+                      <h2>What is architecture?</h2>
+                      <p>
+                        Architecture is a multifaceted discipline that goes beyond the construction of structures; 
+                        it is a form of art that blends creativity and utility. Its basic principles include considering
+                        the function and utility of a building, paying attention to aesthetics and form to create visually 
+                        appealing designs, ensuring the structure and stability for safety, and integrating the building carefully 
+                        with its surrounding environment, considering geographical and cultural factors. 
+                      </p>
+                  </div>
+                  <div class="col-md-4 text-center bg-transparent">
+                      <div class="video-container d-flex justify-content-center align-items-center">
+                          <video style="width: 100%; height: 100%;" preload="auto" controls>
+                              <source src="https://tv.urjc.es/trackfile/5c7d4eb5d68b1469578b4567.mp4" type="video/mp4">
+                              Tu navegador no admite el elemento de video.
+                          </video>
+                      </div>
+                  </div>
+                  <div class="col-md-4 text-center bg-transparent">
+                      <h2>Why study here?</h2>
+                      <p>
+                        Studying architecture at Universidad Rey Juan Carlos (URJC) provides a comprehensive education 
+                        that includes theoretical and practical aspects of architectural design, as well as skills in urban 
+                        planning and environmental sustainability. Students learn to create environments that are aesthetically 
+                        pleasing, energy-efficient, and socially relevant.
+                      </p>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
   <div class="row">
     <div class="col-md-4">
-      <div class="p-5 mb-4 bg-light rounded-3 ">
+      <div class="p-5 mb-4 rounded-3 " style="background-color: rgba(255, 255, 255, 0.8);">
         <div class="container-fluid py-5 text-center d-flex flex-column align-items-center">
-          <h1>URJC</h1>
+          <p>
+            This is an online platform designed exclusively for students and teachers passionate about 
+            the world of architecture. In this space, you can immerse yourself in a collaborative environment 
+            that fosters creativity, learning, and innovation.
+          </p>
           <hr class="my-2">
           <p class="lead">
-            <a href="/libros" class="btn btn-outline-secondary " role="button">Documentos</a>
+            <a href="/admin/registro" class="btn btn-outline-dark rounded-3" role="button">Sign up</a>
+            <a href="/admin/login" class="btn btn-outline-dark rounded-3" role="button">Login</a>
           </p>
         </div>
       </div>
     </div>
-       
+    
     <div class="col-md-8">
-      <div class="p-5 mb-8 bg-light rounded-3">
+      <div class="p-5 mb-8  rounded-3" style="background-color: rgba(255, 255, 255, 0.8);">
         <h1>Información Básica</h1>
         <div class="accordion" id="informacion-accordion">
           <div class="accordion-item">

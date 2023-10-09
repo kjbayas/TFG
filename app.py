@@ -11,39 +11,34 @@ from flaskext.mysql import MySQL
 from flask_mail import Mail, Message
 from config import Config 
 from flask_login import login_required
-
-
+from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
-app.config.from_object(Config)  # Configura la aplicación con la configuración de Config
+
+app.config.from_object(Config)  #Set up the application with the Config configuration.
 app.secret_key = '2023K4rol'
 
-# Inicializa extensiones, MySQL, Mail
+# Initialize extensions, MySQL, Mail
 mysql = MySQL()
 mysql.init_app(app)
 mail = Mail(app)
 babel = Babel(app)
 
-
-
 @app.route('/')
 def inicio():
     return render_template('sitio/index.html')
 
-# Añadimos estilos de forma general 
-@app.route('/css/<archivocss>') 
+@app.route('/css/<archivocss>') # We add styles in a general way 
 def css_link(archivocss):
     return send_from_directory(os.path.join('templates/sitio/css'),archivocss)
 
-# Almacenar Imagenes  
-@app.route('/img/<imagen>') 
+@app.route('/img/<imagen>') # Store images  
 def imagenes(imagen):
     print(imagen)
     return send_from_directory(os.path.join('templates/sitio/img'),imagen)
-
-# llamada a la web de libros 
-@app.route('/libros')
+ 
+@app.route('/libros') # Make a call to the book website
 def libros():
     conexion=mysql.connect()  
     cursor= conexion.cursor()
@@ -56,9 +51,8 @@ def libros():
 @app.route('/nosotros')
 def nosotros():
 
-    id_rol = 0  # id_rol lo definimos 0 para que solo pueda visualizar karolbayas
-    tiene_permiso = False  # Otros roles no tienen permiso para editar
-
+    id_rol = 0  # id_rol we set the role id to 0 to allow only viewering
+    tiene_permiso = False  # Other rol don't have permission to edit 
     conexion = mysql.connect()  
     cursor = conexion.cursor()
     cursor.execute("SELECT id, title, place, str_to_date(start_event, '%Y-%m-%d %H:%i:%s'), str_to_date(end_event, '%Y-%m-%d %H:%i:%s') FROM events")
@@ -67,8 +61,7 @@ def nosotros():
 
     return render_template('sitio/nosotros.html', calendar=calendar, tiene_permiso=tiene_permiso)
 
-# Insertar eventos en el calendario
-@app.route("/insert", methods=["POST", "GET"])
+@app.route("/insert", methods=["POST", "GET"]) # Insert events in the calendar
 def insert():
     conexion = mysql.connect()
     cursor = conexion.cursor()
@@ -85,8 +78,8 @@ def insert():
         cursor.execute("INSERT INTO events (title, place, start_event, end_event) VALUES (%s, %s, %s, %s)", [title, place, start, end])
         conexion.commit()
         conexion.close()
-        msg = 'success'
-    
+        msg = 'success' 
+
     return jsonify(msg)
 
 @app.route("/update", methods=["POST", "GET"])
@@ -134,16 +127,16 @@ def admin_index():
 
 @app.route('/admin/nosotros')
 def admin_nosotros():
-    # Verificar si se ha iniciado sesión
-    if 'login' not in session:
-        return redirect('/admin/login')  # Redireccionar al formulario de inicio de sesión si no ha iniciado sesión
-    # Verificar el rol del usuario actual
-    id_rol = session['id_rol'] # Obtén el valor del rol del usuario actual desde tu sistema de autenticación
+    
+    if 'login' not in session: # Check if the session has been started
+        return redirect('/admin/login')  
+    
+    id_rol = session['id_rol'] # Retrieve the role value of the current user
 
-    if id_rol == 1:  # Si el usuario tiene el rol = 1 "admin"
-        tiene_permiso = True  # Usuario administrador tiene permiso para editar
+    if id_rol == 1:  # User with role =1 is an admin 
+        tiene_permiso = True  
     else:
-        tiene_permiso = False  # rol = 0 no tienen permiso para editar
+        tiene_permiso = False  
 
     conexion = mysql.connect() 
     cursor = conexion.cursor()
@@ -166,37 +159,30 @@ def admin_libros():
     conexion = mysql.connect()
     cursor = conexion.cursor()
 
-    # Obtener los datos de los libros
-    cursor.execute("SELECT * FROM `libros`")
+    cursor.execute("SELECT * FROM `libros`") # We obtain the data of libros
     libros = cursor.fetchall()
 
-    # Obtener los datos de los autores
-    cursor.execute("SELECT id, nombre, apellido FROM autores")
+    cursor.execute("SELECT id, nombre, apellido FROM autores") # We obtain the data of autores
     autores_data = cursor.fetchall()
 
-    # Comprobar la relación entre libros y autores
-    for libro in libros:
+    for libro in libros: # Check the relationship between libros and autores
         libro_id = libro[0]
         autor_id_libro = libro[6]
         autor_encontrado = False
         
-        # Iterar sobre las tuplas de autores_data para buscar el autor
-        for autor_data in autores_data:
+        for autor_data in autores_data: # Iterate over the tuples in  autores_data to find the autor
             autor_id_data = autor_data[0]
             if autor_id_libro == autor_id_data:
                 autor_encontrado = True
                 break
         
-        # Verificar si se encontró el autor para el libro actual
-        if not autor_encontrado:
-            mensaje_error = f"No se encontró el autor para el libro ID: {libro_id}"
+        if not autor_encontrado: # Check if the author was found for the current book
+            mensaje_error = f"Author not found for book ID: {libro_id}"
             return render_template('admin/libros.html', libros=libros, autores=autores_data, mensaje_error=mensaje_error)
-
+        
     conexion.close()
     
-    # Si todos los autores están correctamente relacionados, renderizar la plantilla
-    return render_template('admin/libros.html', libros=libros, autores=autores_data)
-
+    return render_template('admin/libros.html', libros=libros, autores=autores_data) # If all authors are correctly related, render the template
 
 
 @app.route('/admin/login')
@@ -420,6 +406,23 @@ def admin_permisos_aceptar(id_permiso):
 
     return redirect('/admin/permisos')
 
+def guardar_archivo(archivo, carpeta_destino):
+    if archivo.filename == '':
+        return None  # Si no se seleccionó ningún archivo, devolver None
+    
+    # Verificar si el archivo es permitido (puedes definir tus propias extensiones permitidas)
+    extension_permitida = ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp4']
+    if '.' not in archivo.filename or archivo.filename.rsplit('.', 1)[1].lower() not in extension_permitida:
+        return None  # Si la extensión del archivo no es válida, devolver None
+    
+    # Guardar el archivo en la carpeta de destino
+    nombre_archivo = secure_filename(archivo.filename)
+    ruta_guardado = os.path.join(carpeta_destino, nombre_archivo)
+    print("Intentando guardar archivo en:", ruta_guardado)
+    archivo.save(ruta_guardado)
+    
+    return nombre_archivo  # Devolver el nombre del archivo guardado
+
 
 @app.route('/admin/libros/guardar', methods=['POST'])
 def admin_libros_guardar():
@@ -434,19 +437,21 @@ def admin_libros_guardar():
     _area_seleccionada = request.form['txtArea']
     _autor_nombre = request.form['txtAutorNombre'].upper()
     _autor_apellido = request.form['txtAutorApellido'].upper()
+    _descripcion = request.form['txtDescripcion']
+    _video = request.files['txtVideo']
+    _pdf = request.files['txtPDF']
+    _imagen_secundaria = request.files['txtImagenSecundaria']
+
+    _archivo = guardar_archivo(request.files['txtImagen'], 'templates/sitio/img/')
+    _video = guardar_archivo(request.files['txtVideo'], 'static/archivos/videos/')
+    _pdf = guardar_archivo(request.files['txtPDF'], 'static/archivos/pdf/')
+    _imagen_secundaria = guardar_archivo(request.files['txtImagenSecundaria'], 'static/archivos/imagenes/')
 
     # Verificar si algún campo está vacío
     if not _nombre or not _url or not _archivo or not _autor_nombre or not _autor_apellido:
         mensaje_error = 'Please fill in all the fields.'
         return redirect(url_for('admin_libros', mensaje_error=mensaje_error))
 
-    tiempo = datetime.now()
-    horaActual = tiempo.strftime('%Y%H%M%S')
-    if _archivo.filename != "":
-        nuevoNombre = horaActual + "_" + _archivo.filename
-        _archivo.save("templates/sitio/img/" + nuevoNombre)
-
-    # Verificar si el autor ya existe en la base de datos de autores
     conexion = mysql.connect()
     cursor = conexion.cursor()
     cursor.execute("SELECT id FROM autores WHERE nombre = %s AND apellido = %s", (_autor_nombre, _autor_apellido))
@@ -472,16 +477,12 @@ def admin_libros_guardar():
         return redirect(url_for('admin_libros', mensaje_error='Invalid area selected.'))
 
     # Continuar con la inserción del libro en la base de datos de libros, incluyendo el _autor_id y _area_id en la consulta SQL.
-    sql = "INSERT INTO `libros` (`id`, `nombre`, `imagen`, `url`, `year`, `area_id`, `autor_id`) VALUES (NULL, %s, %s, %s, %s, %s, %s);"
-    datos = (_nombre, nuevoNombre, _url, _year, _area_id, _autor_id)
-
+    sql = "INSERT INTO `libros` (`id`, `nombre`, `imagen`, `url`, `year`, `area_id`, `autor_id`, `descripcion`, `video`, `pdf`, `imagen_secundaria`) VALUES (NULL, %s, %s, %s, %s, %s, %s,%s,%s,%s,%s);"
+    datos = (_nombre, _archivo, _url, _year, _area_id, _autor_id,_descripcion, _video, _pdf, _imagen_secundaria)
+    
     cursor.execute(sql, datos)
     conexion.commit()
     conexion.close()
-
-    print(_nombre)
-    print(_url)
-    print(_archivo)
     return redirect('/admin/libros')
 
 @app.route('/sitio/libros', methods=['GET'])
@@ -490,26 +491,25 @@ def sitio_libros():
     area = request.args.get('area')
     author = request.args.get('author')
 
-    # Obtener la lista de autores
     conexion = mysql.connect()
     cursor = conexion.cursor()
     cursor.execute("SELECT id, nombre, apellido FROM autores")
     autores = cursor.fetchall()  # Extraer los resultados antes de cerrar la conexión
     sql = "SELECT * FROM libros WHERE 1=1"     # Construye la consulta SQL que se basa en los parámetros
-    sql_base = "SELECT * FROM libros"
     conditions = [] # crea condiciones de filtrado
     params = []
 
+    if author:
+        author_id = author
+        conditions.append("autor_id = %s")
+        params.append(author_id)
     if year:
         conditions.append("year = %s")
         params.append(year)
     if area:
         conditions.append("area_id = (SELECT id FROM areas WHERE nombre = %s)")
         params.append(area)
-    if author:
-        author_id = author
-        conditions.append("autor_id = %s")
-        params.append(author_id)
+
 
     if conditions:
         sql += " AND " + " AND ".join(conditions)
@@ -519,6 +519,125 @@ def sitio_libros():
     conexion.close()
 
     return render_template('sitio/libros.html', libros=libros, autores=autores)
+
+@app.route('/admin/libros/<int:libro_id>/editar', methods=['GET'])
+def editar_libro(libro_id):
+    if not 'login' in session:
+        return redirect('/admin/login')
+
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
+
+    # Obtener los datos actuales del libro para prellenar el formulario de edición
+    cursor.execute("SELECT * FROM libros WHERE id = %s", (libro_id,))
+    libro = cursor.fetchone()
+
+        # Obtener datos de áreas desde la base de datos
+    cursor.execute("SELECT * FROM areas")
+    areas_data = cursor.fetchall()
+
+
+    # Si el libro no existe, mostrar un mensaje de error
+    if not libro:
+        conexion.close()
+        return render_template('error.html', error_message='Libro no encontrado')
+
+    # Obtener datos adicionales necesarios para el formulario (como lista de áreas, etc.)
+    # Esto es necesario para llenar los campos de selección en el formulario de edición
+
+    cursor.close()
+    conexion.close()
+
+    return render_template('admin/editar_libro.html', libro=libro, areas_data=areas_data)  # Pasa áreas u otros datos necesarios al formulario
+
+
+@app.route('/admin/libros/<int:libro_id>/guardar', methods=['POST'])
+def guardar_cambios_libro(libro_id):
+    if not 'login' in session:
+        return redirect('/admin/login')
+    
+    # Obtener los datos existentes del libro para comparar con los datos del formulario
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT * FROM libros WHERE id = %s", (libro_id,))
+    libro_existente = cursor.fetchone()
+
+    _nombre = request.form['txtNombre'].upper()
+    _url = request.form['txtURL']
+    _archivo = request.files['txtImagen'] if 'txtImagen' in request.files else None
+    _year = request.form['txtYear']
+    _area_seleccionada = request.form['txtArea']
+    _autor_nombre = request.form['txtAutorNombre'].upper()
+    _autor_apellido = request.form['txtAutorApellido'].upper()
+    _descripcion = request.form['txtDescripcion']
+    _video = request.files['txtVideo'] if 'txtVideo' in request.files else None
+    _pdf = request.files['txtPDF'] if 'txtPDF' in request.files else None
+    _imagen_secundaria = request.files['txtImagenSecundaria'] if 'txtImagenSecundaria' in request.files else None
+
+    # Validaciones y procesamiento de archivos, similar a admin_libros_guardar
+
+    # Conectar a la base de datos
+    conexion = mysql.connect()
+    cursor = conexion.cursor()
+
+    # Construir la consulta SQL
+    sql = "UPDATE libros SET nombre=%s, url=%s, year=%s, descripcion=%s"
+    datos = (_nombre, _url, _year, _descripcion)
+
+    # Comprobar si los campos del formulario tienen valores no vacíos y actualizarlos si es necesario
+    if _archivo:
+        archivo_path = guardar_archivo(_archivo, 'templates/sitio/img/')
+        sql += ", imagen=%s"
+        datos += (archivo_path,)
+    if _area_seleccionada:
+        # Obtener el ID del área seleccionada
+        cursor.execute("SELECT id FROM areas WHERE nombre = %s", (_area_seleccionada,))
+        resultado_area = cursor.fetchone()
+        if resultado_area:
+            _area_id = resultado_area[0]  # Obtener el ID del área
+            sql += ", area_id=%s"
+            datos += (_area_id,)
+        else:
+            # Manejar el caso en el que no se encontró la categoría de ÁREA seleccionada
+            conexion.close()
+            return redirect('/admin/libros', mensaje_error='Invalid area selected.')
+    if _video:
+        video_path = guardar_archivo(_video, 'static/archivos/videos/')
+        sql += ", video=%s"
+        datos += (video_path,)
+
+    if _pdf:
+        pdf_path = guardar_archivo(_pdf, 'static/archivos/pdf/')
+        sql += ", pdf=%s"
+        datos += (pdf_path,)
+
+    if _imagen_secundaria:
+        imagen_secundaria_path = guardar_archivo(_imagen_secundaria, 'static/archivos/imagenes/')
+        sql += ", imagen_secundaria=%s"
+        datos += (imagen_secundaria_path,)
+    # Obtener el ID del autor si ya existe en la base de datos
+    cursor.execute("SELECT id FROM autores WHERE nombre = %s AND apellido = %s", (_autor_nombre, _autor_apellido))
+    resultado_autor = cursor.fetchone()
+    if resultado_autor:
+        _autor_id = resultado_autor[0]  # Obtener el ID del autor
+    else:
+        # Si el autor no se encuentra en la base de datos, añadirlo
+        cursor.execute("INSERT INTO autores (nombre, apellido) VALUES (%s, %s)", (_autor_nombre, _autor_apellido))
+        conexion.commit()
+        # Obtener el ID del autor recién añadido
+        _autor_id = cursor.lastrowid
+
+    # Ejecutar la consulta SQL con los datos actualizados
+    sql += ", autor_id=%s WHERE id=%s"
+    datos += (_autor_id, libro_id)
+    cursor.execute(sql, datos)
+    conexion.commit()
+    conexion.close()
+
+    return redirect('/admin/libros')
+
+
+
 
 
 @app.route('/admin/libros/borrar', methods=['POST'])

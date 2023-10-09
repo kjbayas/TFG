@@ -9,11 +9,11 @@
 }
 
 .btn-outline-dark.delete-btn:hover {
-    background-color: #dc3545;
+    background-color: #dd1025;
     color: white;
 }
 
 .btn-outline-dark.info-btn:hover {
-    background-color: #19698c;
+    background-color: #68c274;
     color: white;
 }

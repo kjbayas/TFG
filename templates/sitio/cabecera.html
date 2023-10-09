@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>Página WEB</title>
+  <title>Architecture website</title>
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -16,12 +16,24 @@
     .bold-text {
       font-weight: bold;
     }
+    .navbar-nav .nav-link,
+    .navbar-nav .dropdown-item {
+        color: rgb(24, 24, 78); /* Color predeterminado del texto */
+    }
+
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .dropdown-item:hover,
+    .navbar-nav .nav-link:active,
+    .navbar-nav .dropdown-item:active {
+        color: rgb(184, 30, 115); /* Color del texto cuando se pasa el mouse o está activo */
+    }
+
   </style>
 </head>
 <body>
 
 <!--Menu y container-->
-<nav class="navbar navbar-expand-xl navbar-light bg-light">
+<nav class="navbar navbar-expand-xl rounded-3" style="background-color: rgba(255, 255, 255, 0.8);">
     <div class="container-fluid">
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

@@ -3,8 +3,8 @@
 class Config:
     # Configuración de la base de datos MySQL
     
-    #MYSQL_DATABASE_HOST = '10.22.2.63'
-    MYSQL_DATABASE_HOST = '192.168.1.37'
+    MYSQL_DATABASE_HOST = '10.22.2.63'
+    #MYSQL_DATABASE_HOST = '192.168.1.37'
     MYSQL_DATABASE_USER = 'karolbayas'
     MYSQL_DATABASE_PASSWORD = 'urjc2023'
     MYSQL_DATABASE_DB = 'sitio'

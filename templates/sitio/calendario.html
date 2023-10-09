@@ -13,19 +13,39 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+    <style>
+        #pastEventsContainer {
+            background-color: rgba(45, 162, 245, 0.8);
+            padding: 20px;
+        }
+
+        #pastEvents h2 {
+            padding: 25px;
+            font-family: Arial, sans-serif; /* Fuente del texto */
+        }
+    </style>
 </head>
 <body>
-    <br/>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <h1 class="text-center">Event List</h1>
-                <div class="list-group" id="eventList"></div>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-12 ">
+            <div class="p-5 mb-4 rounded-3 " style="background-color: rgba(255, 255, 255, 0.8);">
+                <div class="row">
+                    <div class="col-md-6 bg-transparent text-center ">
+                        <h1 class="text-center p-4"> Event List </h1>
+                        <div class="list-group " id="eventList"></div>
+                    </div>
+                    <div class="col-md-6 bg-transparent text-center">
+                        <div id="calendar"></div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6">
-                <div id="calendar"></div>
+            <div class="col-md-12 mt-4 rounded-3 p-4" id="pastEventsContainer" style="background-color: rgba(255, 255, 255, 0.8);">
+                <h2 class="text-center p-5">Past Event</h2>
+                <div id="pastEvents"></div>
             </div>
         </div>
+
     </div>
 
     <script>
@@ -113,6 +133,50 @@
             highlightTodayEvents();
             loadEventList(); // Llamar a loadEventList nuevamente después de resaltar los eventos del día
         });
+    
+        var pastEvents = events.filter(function(event) {
+        var eventEndDate = moment(event.end, "YYYY-MM-DDTHH:mm:ss");
+        return eventEndDate.isBefore(today); // Eventos que terminaron antes de hoy
+    });
+
+    // Función para cargar y mostrar eventos pasados
+    function loadPastEvents() {
+        var pastEventsContainer = $('#pastEvents');
+        pastEventsContainer.empty();
+
+        var batchSize = 4;
+        var batches = [];
+        for (var i = 0; i < pastEvents.length; i += batchSize) {
+            batches.push(pastEvents.slice(i, i + batchSize));
+        }
+
+        $.each(batches, function(index, batch) {
+            var row = $('<div class="row"></div>');
+            $.each(batch, function(innerIndex, event) {
+                var startFormatted = moment(event.start).format("DD/MM/YYYY HH:mm:ss");
+                var endFormatted = moment(event.end).format("DD/MM/YYYY HH:mm:ss");
+                var eventItem = `
+                    <div class="col-md-3">
+                        <div class="alert alert-secondary" role="alert">
+                            <strong>${event.title}</strong><br>
+                            <strong>Start Date:</strong> ${startFormatted}<br>
+                            <strong>End Date:</strong> ${endFormatted}<br>
+                            <strong>Place:</strong> ${event.place}
+                        </div>
+                    </div>`;
+                row.append(eventItem);
+            });
+            pastEventsContainer.append(row);
+        });
+    }
+
+    // Llama a la función para cargar eventos pasados cuando el DOM esté listo
+    $(document).ready(function() {
+        loadEventList();
+        highlightTodayEvents();
+        loadEventList(); // Llamar a loadEventList nuevamente después de resaltar los eventos del día
+        loadPastEvents(); // Cargar eventos pasados
+    });
 
     </script>
 </body>

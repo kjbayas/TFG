@@ -19,10 +19,13 @@
                     <td class=" d-flex align-items-center">
                         <form action="/admin/libros/borrar" method="post">
                             <input value="{{libro[0]}}" type="hidden" name="txtID" id="txtID">
-                            <button type="submit" class="btn btn-outline-dark delete-btn me-4">Delete</button>
+                            <button type="submit" class="btn btn-outline-dark delete-btn me-2">Delete</button>
                         </form>
-                        <a href="/admin/libros/{{ libro[0] }}" class="btn btn-outline-dark info-btn">Books</a>
+                        <a href="/admin/libros/{{ libro[0] }}" class="btn btn-outline-dark info-btn me-2">Books</a>
+                        <a href="/admin/libros/{{ libro[0] }}/editar"class="btn btn-outline-dark info-btn">Editar</a>
+                        
                     </td>
+                    
                     <td>
                         <img width="50" height="50" src="/img/{{libro[2]}}" class="img-fluid rounded-top img-grayscale" alt="">
                     </td>

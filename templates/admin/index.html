@@ -1,25 +1,94 @@
 {% include 'admin/cabecera.html' %}
+<!doctype html>
+<html lang="en">
+
+<head>
+  
+    <style>
+        .highlight-text {
+        color: rgb(62, 115, 148);
+        font-weight: bold;
+        }
+
+    </style>
+
+</head>
+  
+
 </br>
-<div class="row">
-    <div class="col-md-10">
-        <div class="p-5 mb-8 bg-light rounded-3">
-            <p class="lead"> Hay que seguir implementando cosas, como subir imagenes y poner estilos, esta es una pag de bienvenida   </p>
-            <hr class="my-2">
-            <p class="lead">
-            <a class="btn btn-outline-success " href="/admin/libros" role="button"> Subir archivos </a>
-            </p>
+<div class="row h-100 align-items-stretch">
+    <div class="col-md-8 mb-4 d-flex flex-column">
+        <div class="d-flex flex-fill">
+            <div class="p-5 mb-8 bg-light rounded-3 text-center w-100">
+                <p class="lead">
+                    "We are pleased to welcome you to our online platform designed exclusively for students and passionate teachers 
+                    interested in the world of architecture. In this dynamic space, you can immerse yourself in a collaborative 
+                    environment that nurtures creativity, learning, and innovation." 
+                </p>
+                <hr class="my-4">
+            </div>
         </div>
     </div>
-    
-    <div class="col-md-2">
-        <div class="p-5 mb-4 bg-light rounded-3">
-            <p > Bienvenid@ <strong style="color: rgb(143, 12, 75);">{{session['username']}}</strong> 
-                ahora podrás administrar todos tus documentos
-            </p>
+
+    <div class="col-md-4 mb-4 d-flex flex-column">
+        <div class="d-flex flex-fill align-items-center justify-content-center">
+            <div class="p-5 mb-4 bg-light rounded-3 text-center w-100">
+                <h3 class="lead"> Welcome  
+                    <strong style="color: rgb(161, 16, 67);">{{session['username']}}</strong>
+                    to our Architecture Community!
+                </h3>
+                <hr class="my-4">
+                <a class="btn btn-outline-dark" href="/admin/libros" role="button">Would you like to start?</a>
+            </div>
         </div>
     </div>
 </div>
 
+
+<div class="row">
+    <div class="col-md-12 ">
+        <div class="p-5 mb-4 bg-light rounded-3 text-center">
+            <h2>Our Community, Your Space.</h2>
+            <br>
+            <p class="lead">
+                "This platform is not just an online space; it's a community. Here, each one of you has the opportunity to contribute, 
+                learn, and grow together. Feel free to explore, ask questions, share, and above all, be inspired. We appreciate your 
+                participation and hope that your experience in our community is enriching and rewarding. Let's build the future of 
+                architecture together!"
+            </p>
+            <hr class="my-5">
+            <h2 >What can they expect?</h2>
+            <br>
+
+            <ol class=" lead highlight-list list-group list-group-numbered text-start">
+                <li class="list-group-item">
+                    <span class="highlight-text">Share Knowledge: </span> 
+                    "Upload and share documents, research, and projects to enrich collective knowledge. 
+                    This platform is designed so that every contribution matters and inspires others."
+                </li>
+                
+                <li class="list-group-item">
+                    <span class="highlight-text">Connect with Events: </span>
+                    "Stay informed about the latest news and important dates in the world of architecture. 
+                    From talks and workshops to exhibitions, here you will find a comprehensive calendar of 
+                    events to keep you updated."
+                </li>
+                <li class="list-group-item">
+                    <span class="highlight-text">Limitless Collaboration: </span>
+                    "We encourage collaboration among students and teachers. Use our collaboration tools to 
+                    work together on projects, research, and activities that drive the field of architecture forward."
+                </li>
+                <li class="list-group-item">
+                    <span class="highlight-text">Explore Creativity: </span>
+                    "Get inspired by exploring the work of others, from innovative designs to creative solutions for 
+                    architectural challenges. The diversity of ideas is our greatest asset."
+                </li>
+
+            </ol>
+
+        </div>
+    </div>
+</div>
 
 
 {% include 'admin/pie.html' %}
