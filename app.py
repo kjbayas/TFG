@@ -6,7 +6,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, redirect, session, url_for, send_from_directory, jsonify
-from flask_babel import Babel
+from flask_babel import Babel #traduccion FALTA 
 from flaskext.mysql import MySQL
 from flask_mail import Mail, Message
 from config import Config 
@@ -691,7 +691,7 @@ def agregar_comentario(libro_id):
     # Verificar si user_id es None (no hay usuario en la sesión)
     if user_id is None:
         # Redirigir al usuario a la página de inicio de sesión o mostrar un mensaje de error
-        return render_template('error.html', error_message='Debes iniciar sesión para comentar')
+        return render_template('error.html', error_message='Debes iniciar sesión para comentar', back_url=request.referrer or '/')
     
     conexion=mysql.connect()
     cursor= conexion.cursor()
@@ -703,6 +703,10 @@ def agregar_comentario(libro_id):
 
 @app.route('/admin/libros/comentarios/<int:comentario_id>/eliminar', methods=['POST', 'DELETE'])
 def eliminar_comentario(comentario_id):
+    user_id = session.get('id')
+    if user_id is None:
+        # Redirigir al usuario a la página de inicio de sesión o mostrar un mensaje de error
+        return render_template('error.html', error_message='Debes iniciar sesión para eliminar comentarios', back_url=request.referrer or '/')
     if request.method in ['POST', 'DELETE']:
         try:
             conexion = mysql.connect()
@@ -712,7 +716,7 @@ def eliminar_comentario(comentario_id):
             return redirect(request.referrer)
         except Exception as e:
             print("Error al eliminar comentario:", e)
-            return render_template('error.html', error_message='Error al eliminar comentario')
+            return render_template('error.html', error_message='Error al eliminar comentario', back_url=request.referrer or '/')
 
 @app.route('/favicon.ico')
 def favicon():
